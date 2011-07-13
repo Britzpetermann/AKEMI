@@ -5,3 +5,8 @@
 -cp construct/src_bpmjs
 -cp construct/src_bpmgl
 -lib hsl-1
+
+-js release/bin/TestRunner.js
+-main TestRunner
+-cp construct/src_test
+-cp construct/src_bpmjs
