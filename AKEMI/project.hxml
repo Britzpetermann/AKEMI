@@ -6,6 +6,8 @@
 -cp construct/src_bpmgl
 -lib hsl-1
 
+--next
+
 -js release/bin/TestRunner.js
 -main TestRunner
 -cp construct/src_test
