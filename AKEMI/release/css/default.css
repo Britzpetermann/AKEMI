@@ -1,0 +1,32 @@
+body {
+    background: #000000;
+}
+
+.log {
+    font-family: "Courier";
+    margin-top: 25px;
+    margin-left: 10px;
+    font-size: 10px;
+    position: absolute;
+    background: #000000;
+    color: #ffffff;
+    opacity:0.3;
+    white-space:pre;
+}
+
+.preloader {
+    font-family: "Courier";
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 12px;
+    position: absolute;
+    background: #000000;
+    color: #ffffff;
+    white-space:pre;
+}
+
+.content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}

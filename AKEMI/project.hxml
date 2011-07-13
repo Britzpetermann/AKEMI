@@ -1,0 +1,7 @@
+-js release/bin/Main.js
+-main sa.Main
+-cp construct/src
+-cp construct/src_extern
+-cp construct/src_bpmjs
+-cp construct/src_bpmgl
+-lib hsl-1

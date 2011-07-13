@@ -1,0 +1,14 @@
+package sa.view;
+
+enum TextureId
+{
+	STRIPE1;
+	STRIPE2;
+	BACKGROUND;
+	STONES_RIGHT;
+	STONES_LEFT;
+	ROCK_LEFT;
+	ROCK_RIGHT;
+	CREDITS;
+	FLIGHTER;
+}

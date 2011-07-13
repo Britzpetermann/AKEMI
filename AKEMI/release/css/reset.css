@@ -1,0 +1,24 @@
+body, html, div, object, a, iframe, img {
+    margin: 0;
+    padding: 0
+}
+
+img {
+    border: 0
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    overflow: auto
+}
+
+body {
+    height: 100%
+}
+
+object {
+    outline: none;
+    display: block;
+    overflow: hidden
+}

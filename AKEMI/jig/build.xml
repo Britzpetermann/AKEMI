@@ -1,0 +1,8 @@
+<project name="StrangeAttractor" default="publish to britzpetermann">
+
+	<target name="publish to britzpetermann">
+		<ftp password="${bpm_pass}" server="britzpetermann.com" userid="britzpetermann" verbose="yes" remotedir="/subdomains/static/httpdocs/experiments/akemi">
+			<fileset dir="${basedir}/../release" />
+		</ftp>
+	</target>
+</project>
