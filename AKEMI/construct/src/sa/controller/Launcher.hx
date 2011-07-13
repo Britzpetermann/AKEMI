@@ -48,7 +48,7 @@ class Launcher extends EventDispatcher, implements Infos
 		group.add(createTextureTask("image/Stones2.png", TextureId.STONES_LEFT, textureRegistry.gl.LINEAR));
 		group.add(createTextureTask("image/RockLeft2.png", TextureId.ROCK_LEFT, textureRegistry.gl.LINEAR));
 		group.add(createTextureTask("image/RockRight3.png", TextureId.ROCK_RIGHT, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/BG.jpg", TextureId.BACKGROUND, textureRegistry.gl.NEAREST));
+		group.add(createTextureTask("image/BG3.jpg", TextureId.BACKGROUND, textureRegistry.gl.NEAREST));
 		group.add(createTextureTask("image/Credits2.png", TextureId.CREDITS, textureRegistry.gl.LINEAR));
 		group.add(createImageTask("image/SplashWithText.jpg", ImageId.SPLASH));
 		group.add(createImageTask("image/CreditsBt.png", ImageId.CREDITS_BTN));

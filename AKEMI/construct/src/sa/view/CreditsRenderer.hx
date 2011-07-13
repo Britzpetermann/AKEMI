@@ -1,14 +1,17 @@
 package sa.view;
+
+import sa.model.CommonModel;
+
 import js.Lib;
 
 class CreditsRenderer
 {
+	public var commonModel : CommonModel;
+	
 	public var texture : GLTexture;
 	
 	public var projectionMatrix : Matrix4;
 	public var cameraMatrix : Matrix4;
-	
-	public var showCredits : Bool;
 	
 	static var DEBUG_DRAW_HITAREAS = false;
 	
@@ -48,12 +51,13 @@ class CreditsRenderer
 		
 		buttons = new Array();
 		var lineHeight = 0.031;
-		createButton(0.17, 0.015, 0.035, "http://www.audiotool.com/track/carsberg");
-		createButton(0.17, 0.015, 0.035 + lineHeight * 1, "http://www.bit-101.com");
-		createButton(0.17, 0.015, 0.035 + lineHeight * 2, "http://fontfabric.com/code-pro");
-		createButton(0.17, 0.015, 0.035 + lineHeight * 3, "http://www.omkrets.se/typografi");
-		createButton(0.17, 0.015, 0.035 + lineHeight * 4, "http://www.britzpetermann.com");
-		createButton(0.25, 0.02, 0.28, "http://www.britzpetermann.com/blog/akemi");
+		createButton(0.19, 0.19, 0.4, -0.4, "close");
+		createButton(0.17, 0.015, 0, 0.035, "http://www.audiotool.com/track/carsberg");
+		createButton(0.17, 0.015, 0, 0.035 + lineHeight * 1, "http://www.bit-101.com");
+		createButton(0.17, 0.015, 0, 0.035 + lineHeight * 2, "http://fontfabric.com/code-pro");
+		createButton(0.17, 0.015, 0, 0.035 + lineHeight * 3, "http://www.omkrets.se/typografi");
+		createButton(0.17, 0.015, 0, 0.035 + lineHeight * 4, "http://www.britzpetermann.com");
+		createButton(0.25, 0.02, 0, 0.28, "http://www.britzpetermann.com/blog/akemi");
 	}
 	
 	public function init(gl : WebGLRenderingContext)
@@ -92,7 +96,7 @@ class CreditsRenderer
 	{
 		moveSet.move();
 		
-		if (showCredits)
+		if (commonModel.showCredits)
 			moveSet.to = defaultTargetIn;
 		else
 			moveSet.to = defaultTargetOut;
@@ -137,7 +141,7 @@ class CreditsRenderer
 			viewWorldMatrixButton.appendScale(1,-1,1);
 			viewWorldMatrixButton.appendTranslation(0, moveSet.current, -7);
 			viewWorldMatrixButton.appendScale(scale, scale, 1);
-			viewWorldMatrixButton.appendTranslation(0, button.y, 0);
+			viewWorldMatrixButton.appendTranslation(button.pos.x, button.pos.y, 0);
 			viewWorldMatrixButton.appendScale(button.size.x, button.size.y, 1);
 	    	
 	    	if (DEBUG_DRAW_HITAREAS)
@@ -186,11 +190,11 @@ class CreditsRenderer
 		return 1024 / tl.x;
 	}
 	
-	function createButton(width : Float, height : Float, y : Float, url : String)
+	function createButton(width : Float, height : Float, x: Float, y : Float, url : String)
 	{
 		var button = new Button();
 		button.size = new Vec2(width, height);
-		button.y = y;
+		button.pos = new Vec2(x, y);
 		button.isActive = false;
 		button.url = url;
 		buttons.push(button);
@@ -233,7 +237,14 @@ class CreditsRenderer
 		{
 			if (button.isActive)
 			{
-				js.Lib.window.open(button.url, "_self");
+				if (button.url == "close")
+				{
+					commonModel.showCredits = false;				
+				}
+				else
+				{
+					js.Lib.window.open(button.url, "_self");
+				}
 				return;
 			}
 		}
@@ -243,7 +254,7 @@ class CreditsRenderer
 class Button
 {
 	public var size : Vec2;
-	public var y : Float;
+	public var pos : Vec2;
 	public var isActive : Bool;
 	public var url : String;
 	

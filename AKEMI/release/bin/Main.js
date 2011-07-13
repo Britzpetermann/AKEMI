@@ -1614,7 +1614,7 @@ sa.controller.Launcher.prototype.fontsLoaded = function() {
 	group.add(this.createTextureTask("image/Stones2.png",sa.view.TextureId.STONES_LEFT,this.textureRegistry.gl.LINEAR));
 	group.add(this.createTextureTask("image/RockLeft2.png",sa.view.TextureId.ROCK_LEFT,this.textureRegistry.gl.LINEAR));
 	group.add(this.createTextureTask("image/RockRight3.png",sa.view.TextureId.ROCK_RIGHT,this.textureRegistry.gl.LINEAR));
-	group.add(this.createTextureTask("image/BG.jpg",sa.view.TextureId.BACKGROUND,this.textureRegistry.gl.NEAREST));
+	group.add(this.createTextureTask("image/BG3.jpg",sa.view.TextureId.BACKGROUND,this.textureRegistry.gl.NEAREST));
 	group.add(this.createTextureTask("image/Credits2.png",sa.view.TextureId.CREDITS,this.textureRegistry.gl.LINEAR));
 	group.add(this.createImageTask("image/SplashWithText.jpg",sa.view.ImageId.SPLASH));
 	group.add(this.createImageTask("image/CreditsBt.png",sa.view.ImageId.CREDITS_BTN));
@@ -4689,6 +4689,7 @@ sa.view.CanvasView.prototype.handleLauncherStart = function(event) {
 	this.backgroundRenderer.cameraMatrix = this.commonModel.cameraMatrix;
 	this.backgroundRenderer.init(this.gl);
 	this.creditsRenderer = new sa.view.CreditsRenderer();
+	this.creditsRenderer.commonModel = this.commonModel;
 	this.creditsRenderer.texture = this.textureRegistry.get(sa.view.TextureId.CREDITS);
 	this.creditsRenderer.projectionMatrix = this.commonModel.projectionMatrix;
 	this.creditsRenderer.cameraMatrix = this.commonModel.cameraMatrix;
@@ -4755,7 +4756,6 @@ sa.view.CanvasView.prototype.renderScene = function() {
 	this.gl.viewport(0,0,this.canvas.width,this.canvas.height);
 	this.saRenderer.peak = this.commonModel.peak;
 	this.saRenderer.render(this.canvas.width,this.canvas.height);
-	this.creditsRenderer.showCredits = this.commonModel.showCredits;
 	this.creditsRenderer.render(this.canvas.width,this.canvas.height);
 	this.gl.enable(this.gl.BLEND);
 	this.gl.blendFunc(this.gl.SRC_ALPHA,this.gl.ONE);
@@ -5145,18 +5145,19 @@ sa.view.CreditsRenderer = function(p) { if( p === $_ ) return; {
 	this.moveSet.acceleration = 0.03;
 	this.buttons = new Array();
 	var lineHeight = 0.031;
-	this.createButton(0.17,0.015,0.035,"http://www.audiotool.com/track/carsberg");
-	this.createButton(0.17,0.015,0.035 + lineHeight,"http://www.bit-101.com");
-	this.createButton(0.17,0.015,0.035 + lineHeight * 2,"http://fontfabric.com/code-pro");
-	this.createButton(0.17,0.015,0.035 + lineHeight * 3,"http://www.omkrets.se/typografi");
-	this.createButton(0.17,0.015,0.035 + lineHeight * 4,"http://www.britzpetermann.com");
-	this.createButton(0.25,0.02,0.28,"http://www.britzpetermann.com/blog/akemi");
+	this.createButton(0.19,0.19,0.4,-0.4,"close");
+	this.createButton(0.17,0.015,0,0.035,"http://www.audiotool.com/track/carsberg");
+	this.createButton(0.17,0.015,0,0.035 + lineHeight,"http://www.bit-101.com");
+	this.createButton(0.17,0.015,0,0.035 + lineHeight * 2,"http://fontfabric.com/code-pro");
+	this.createButton(0.17,0.015,0,0.035 + lineHeight * 3,"http://www.omkrets.se/typografi");
+	this.createButton(0.17,0.015,0,0.035 + lineHeight * 4,"http://www.britzpetermann.com");
+	this.createButton(0.25,0.02,0,0.28,"http://www.britzpetermann.com/blog/akemi");
 }}
 sa.view.CreditsRenderer.__name__ = ["sa","view","CreditsRenderer"];
+sa.view.CreditsRenderer.prototype.commonModel = null;
 sa.view.CreditsRenderer.prototype.texture = null;
 sa.view.CreditsRenderer.prototype.projectionMatrix = null;
 sa.view.CreditsRenderer.prototype.cameraMatrix = null;
-sa.view.CreditsRenderer.prototype.showCredits = null;
 sa.view.CreditsRenderer.prototype.gl = null;
 sa.view.CreditsRenderer.prototype.shaderProgram = null;
 sa.view.CreditsRenderer.prototype.shaderProgramButton = null;
@@ -5195,7 +5196,7 @@ sa.view.CreditsRenderer.prototype.init = function(gl) {
 }
 sa.view.CreditsRenderer.prototype.render = function(width,height) {
 	this.moveSet.move();
-	if(this.showCredits) this.moveSet.to = this.defaultTargetIn;
+	if(this.commonModel.showCredits) this.moveSet.to = this.defaultTargetIn;
 	else this.moveSet.to = this.defaultTargetOut;
 	if(this.moveSet.current == this.defaultTargetOut) return;
 	this.gl.useProgram(this.shaderProgram);
@@ -5229,7 +5230,7 @@ sa.view.CreditsRenderer.prototype.render = function(width,height) {
 			viewWorldMatrixButton.appendScale(1,-1,1);
 			viewWorldMatrixButton.appendTranslation(0,this.moveSet.current,-7);
 			viewWorldMatrixButton.appendScale(scale,scale,1);
-			viewWorldMatrixButton.appendTranslation(0,button.y,0);
+			viewWorldMatrixButton.appendTranslation(button.pos.x,button.pos.y,0);
 			viewWorldMatrixButton.appendScale(button.size.x,button.size.y,1);
 			if(sa.view.CreditsRenderer.DEBUG_DRAW_HITAREAS) {
 				this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -5264,10 +5265,10 @@ sa.view.CreditsRenderer.prototype.computeScale = function(width,height) {
 	tl.multiply(width / 2,-height / 2,1,1);
 	return 1024 / tl.x;
 }
-sa.view.CreditsRenderer.prototype.createButton = function(width,height,y,url) {
+sa.view.CreditsRenderer.prototype.createButton = function(width,height,x,y,url) {
 	var button = new sa.view.Button();
 	button.size = new Vec2(width,height);
-	button.y = y;
+	button.pos = new Vec2(x,y);
 	button.isActive = false;
 	button.url = url;
 	this.buttons.push(button);
@@ -5303,7 +5304,12 @@ sa.view.CreditsRenderer.prototype.mouseDown = function(mousePos) {
 		var button = _g1[_g];
 		++_g;
 		if(button.isActive) {
-			js.Lib.window.open(button.url,"_self");
+			if(button.url == "close") {
+				this.commonModel.showCredits = false;
+			}
+			else {
+				js.Lib.window.open(button.url,"_self");
+			}
 			return;
 		}
 	}
@@ -5314,7 +5320,7 @@ sa.view.Button = function(p) { if( p === $_ ) return; {
 }}
 sa.view.Button.__name__ = ["sa","view","Button"];
 sa.view.Button.prototype.size = null;
-sa.view.Button.prototype.y = null;
+sa.view.Button.prototype.pos = null;
 sa.view.Button.prototype.isActive = null;
 sa.view.Button.prototype.url = null;
 sa.view.Button.prototype.__class__ = sa.view.Button;
@@ -6281,7 +6287,7 @@ sa.Config.__rtti = "<class path=\"sa.Config\" params=\"\">\n\t<implements path=\
 sa.view.MainInterfaceView.__meta__ = { fields : { imageRegistry : { Inject : null}, commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}, handleStageResize : { MessageHandler : null}}};
 sa.view.MainInterfaceView.__rtti = "<class path=\"sa.view.MainInterfaceView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<imageRegistry><c path=\"GLImageRegistry\"/></imageRegistry>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<stage public=\"1\"><c path=\"GLStage\"/></stage>\n\t<blend><c path=\"GLDisplayObject\"/></blend>\n\t<startButton><c path=\"GLInteractiveObject\"/></startButton>\n\t<creditsButton><c path=\"GLInteractiveObject\"/></creditsButton>\n\t<modeButton><c path=\"GLInteractiveObject\"/></modeButton>\n\t<handleLauncherStart set=\"method\" line=\"37\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<start public=\"1\" set=\"method\" line=\"76\"><f a=\"\"><e path=\"Void\"/></f></start>\n\t<handleStartFadeInComplete set=\"method\" line=\"82\"><f a=\"tween\">\n\t<c path=\"GLTween\"/>\n\t<e path=\"Void\"/>\n</f></handleStartFadeInComplete>\n\t<handeClick set=\"method\" line=\"87\"><f a=\"?obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handeClick>\n\t<handleStartFadeOutComplete set=\"method\" line=\"101\"><f a=\"tween\">\n\t<c path=\"GLTween\"/>\n\t<e path=\"Void\"/>\n</f></handleStartFadeOutComplete>\n\t<handleCreditsButtonClick set=\"method\" line=\"112\"><f a=\"obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handleCreditsButtonClick>\n\t<handleModeButtonClick set=\"method\" line=\"117\"><f a=\"obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handleModeButtonClick>\n\t<handleStageResize set=\"method\" line=\"123\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<layoutElements set=\"method\" line=\"128\"><f a=\"\"><e path=\"Void\"/></f></layoutElements>\n\t<new public=\"1\" set=\"method\" line=\"31\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 sa.view.CanvasView.__meta__ = { fields : { commonModel : { Inject : null}, textureRegistry : { Inject : null}, mainInterfaceView : { Inject : null}, handleLauncherStart : { MessageHandler : null}, handleStageResize : { MessageHandler : null}}};
-sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<mainInterfaceView><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<gl><c path=\"WebGLRenderingContext\"/></gl>\n\t<canvas><c path=\"Canvas\"/></canvas>\n\t<framebuffer><c path=\"GLFramebuffer\"/></framebuffer>\n\t<backgroundRenderer><c path=\"sa.view.BackgroundRenderer\"/></backgroundRenderer>\n\t<underWaterRenderer><c path=\"sa.view.UnderWaterRenderer\"/></underWaterRenderer>\n\t<textureRenderer><c path=\"sa.view.TextureRenderer\"/></textureRenderer>\n\t<planktonRenderer><c path=\"sa.view.PlanktonRenderer\"/></planktonRenderer>\n\t<rocksRenderer><c path=\"sa.view.RocksRenderer\"/></rocksRenderer>\n\t<saRenderer><c path=\"sa.view.StrangeAttractorRenderer\"/></saRenderer>\n\t<displayListRenderer><c path=\"GLDisplayListRenderer\"/></displayListRenderer>\n\t<creditsRenderer><c path=\"sa.view.CreditsRenderer\"/></creditsRenderer>\n\t<handleLauncherStart set=\"method\" line=\"36\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleModeChanged set=\"method\" line=\"92\"><f a=\"newMode\">\n\t<c path=\"Int\"/>\n\t<e path=\"Void\"/>\n</f></handleModeChanged>\n\t<handleStageResize set=\"method\" line=\"98\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<updateCanvas set=\"method\" line=\"103\"><f a=\"\"><e path=\"Void\"/></f></updateCanvas>\n\t<tick set=\"method\" line=\"109\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<renderScene set=\"method\" line=\"126\"><f a=\"\"><e path=\"Void\"/></f></renderScene>\n\t<renderInterface set=\"method\" line=\"158\"><f a=\"\"><e path=\"Void\"/></f></renderInterface>\n\t<new public=\"1\" set=\"method\" line=\"33\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
+sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<mainInterfaceView><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<gl><c path=\"WebGLRenderingContext\"/></gl>\n\t<canvas><c path=\"Canvas\"/></canvas>\n\t<framebuffer><c path=\"GLFramebuffer\"/></framebuffer>\n\t<backgroundRenderer><c path=\"sa.view.BackgroundRenderer\"/></backgroundRenderer>\n\t<underWaterRenderer><c path=\"sa.view.UnderWaterRenderer\"/></underWaterRenderer>\n\t<textureRenderer><c path=\"sa.view.TextureRenderer\"/></textureRenderer>\n\t<planktonRenderer><c path=\"sa.view.PlanktonRenderer\"/></planktonRenderer>\n\t<rocksRenderer><c path=\"sa.view.RocksRenderer\"/></rocksRenderer>\n\t<saRenderer><c path=\"sa.view.StrangeAttractorRenderer\"/></saRenderer>\n\t<displayListRenderer><c path=\"GLDisplayListRenderer\"/></displayListRenderer>\n\t<creditsRenderer><c path=\"sa.view.CreditsRenderer\"/></creditsRenderer>\n\t<handleLauncherStart set=\"method\" line=\"36\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleModeChanged set=\"method\" line=\"93\"><f a=\"newMode\">\n\t<c path=\"Int\"/>\n\t<e path=\"Void\"/>\n</f></handleModeChanged>\n\t<handleStageResize set=\"method\" line=\"99\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<updateCanvas set=\"method\" line=\"104\"><f a=\"\"><e path=\"Void\"/></f></updateCanvas>\n\t<tick set=\"method\" line=\"110\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<renderScene set=\"method\" line=\"127\"><f a=\"\"><e path=\"Void\"/></f></renderScene>\n\t<renderInterface set=\"method\" line=\"158\"><f a=\"\"><e path=\"Void\"/></f></renderInterface>\n\t<new public=\"1\" set=\"method\" line=\"33\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 haxe.Timer.arr = new Array();
 sa.view.CreditsRenderer.DEBUG_DRAW_HITAREAS = false;
 sa.controller.CameraController.__meta__ = { fields : { commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}}};

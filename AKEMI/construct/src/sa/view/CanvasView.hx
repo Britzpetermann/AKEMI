@@ -50,6 +50,7 @@ class CanvasView implements Infos
         backgroundRenderer.init(gl);
         
  		creditsRenderer = new CreditsRenderer();
+ 		creditsRenderer.commonModel = commonModel;
  		creditsRenderer.texture = textureRegistry.get(TextureId.CREDITS);
  		creditsRenderer.projectionMatrix = commonModel.projectionMatrix;
  		creditsRenderer.cameraMatrix = commonModel.cameraMatrix;
@@ -146,7 +147,6 @@ class CanvasView implements Infos
 		saRenderer.peak = commonModel.peak;
 		saRenderer.render(canvas.width, canvas.height);
 				
-		creditsRenderer.showCredits = commonModel.showCredits;
 		creditsRenderer.render(canvas.width, canvas.height);
 		
 		gl.enable(gl.BLEND);
