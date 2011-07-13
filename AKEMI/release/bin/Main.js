@@ -1385,7 +1385,7 @@ sa.model.CommonModel.prototype.mode = null;
 sa.model.CommonModel.prototype.toggleMode = function() {
 	this.mode++;
 	this.mode = this.mode % 3;
-	this.modeChangeSignaler.dispatch(this.mode,null,{ fileName : "CommonModel.hx", lineNumber : 49, className : "sa.model.CommonModel", methodName : "toggleMode"});
+	this.modeChangeSignaler.dispatch(this.mode,null,{ fileName : "CommonModel.hx", lineNumber : 48, className : "sa.model.CommonModel", methodName : "toggleMode"});
 }
 sa.model.CommonModel.prototype.toggleCredits = function() {
 	this.showCredits = !this.showCredits;
@@ -5486,7 +5486,6 @@ Property.prototype.ease = function(tween,dt) {
 Property.prototype.__class__ = Property;
 sa.controller.CameraController = function(p) { if( p === $_ ) return; {
 	this.cameraPosition = new MoveSetVec2(new Vec2(0,0),new Vec2(0,0),new Vec2(0.0005,0.0005));
-	GLAnimationFrame.run($closure(this,"tick"));
 }}
 sa.controller.CameraController.__name__ = ["sa","controller","CameraController"];
 sa.controller.CameraController.prototype.commonModel = null;
@@ -5494,6 +5493,7 @@ sa.controller.CameraController.prototype.cameraPosition = null;
 sa.controller.CameraController.prototype.lastTick = null;
 sa.controller.CameraController.prototype.handleLauncherStart = function(event) {
 	GLMouseRegistry.getInstance().mouseMoveSignaler.bind($closure(this,"handleMouseMove"));
+	GLAnimationFrame.run($closure(this,"tick"));
 }
 sa.controller.CameraController.prototype.tick = function() {
 	var dt = Date.now().getTime() - this.lastTick;
@@ -6291,7 +6291,7 @@ sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t
 haxe.Timer.arr = new Array();
 sa.view.CreditsRenderer.DEBUG_DRAW_HITAREAS = false;
 sa.controller.CameraController.__meta__ = { fields : { commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}}};
-sa.controller.CameraController.__rtti = "<class path=\"sa.controller.CameraController\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<cameraPosition><c path=\"MoveSetVec2\"/></cameraPosition>\n\t<lastTick><c path=\"Float\"/></lastTick>\n\t<handleLauncherStart set=\"method\" line=\"26\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<tick set=\"method\" line=\"31\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<handleMouseMove set=\"method\" line=\"41\"><f a=\"mousePos\">\n\t<c path=\"Vec2\"/>\n\t<e path=\"Void\"/>\n</f></handleMouseMove>\n\t<new public=\"1\" set=\"method\" line=\"18\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
+sa.controller.CameraController.__rtti = "<class path=\"sa.controller.CameraController\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<cameraPosition><c path=\"MoveSetVec2\"/></cameraPosition>\n\t<lastTick><c path=\"Float\"/></lastTick>\n\t<handleLauncherStart set=\"method\" line=\"24\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<tick set=\"method\" line=\"30\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<handleMouseMove set=\"method\" line=\"40\"><f a=\"mousePos\">\n\t<c path=\"Vec2\"/>\n\t<e path=\"Void\"/>\n</f></handleMouseMove>\n\t<new public=\"1\" set=\"method\" line=\"18\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 bpmjs.Stats.fps = 0;
 sa.controller.StageResizeAction.__meta__ = { obj : { ManagedEvents : ["stageResize"]}, fields : { commonModel : { Inject : null}, handleComplete : { Complete : null}, handleLauncherStart : { MessageHandler : null}}};
 sa.controller.StageResizeAction.__rtti = "<class path=\"sa.controller.StageResizeAction\" params=\"\">\n\t<extends path=\"bpmjs.EventDispatcher\"/>\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel public=\"1\"><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<handleComplete public=\"1\" set=\"method\" line=\"22\"><f a=\"\"><e path=\"Void\"/></f></handleComplete>\n\t<handleLauncherStart public=\"1\" set=\"method\" line=\"28\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<timerUpdate set=\"method\" line=\"34\"><f a=\"\"><e path=\"Void\"/></f></timerUpdate>\n\t<onResize set=\"method\" line=\"40\"><f a=\"?event\">\n\t<t path=\"js.Event\"/>\n\t<e path=\"Void\"/>\n</f></onResize>\n\t<updateSize set=\"method\" line=\"46\"><f a=\"\"><e path=\"Void\"/></f></updateSize>\n\t<fireUpdate set=\"method\" line=\"60\"><f a=\"\"><e path=\"Void\"/></f></fireUpdate>\n\t<new public=\"1\" set=\"method\" line=\"16\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";

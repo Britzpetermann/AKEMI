@@ -18,14 +18,13 @@ class CameraController implements Infos
 	public function new()
 	{
 		cameraPosition = new MoveSetVec2(new Vec2(0,0), new Vec2(0,0), new Vec2(0.0005,0.0005));
-		
-		GLAnimationFrame.run(tick);
 	}
 	
 	@MessageHandler
 	function handleLauncherStart(event : LauncherStart)
 	{
 		GLMouseRegistry.getInstance().mouseMoveSignaler.bind(handleMouseMove);		
+		GLAnimationFrame.run(tick);
 	}
 
 	function tick()

@@ -1,8 +1,19 @@
 <project name="StrangeAttractor" default="publish to britzpetermann">
 
-	<target name="publish to britzpetermann">
+	<target name="publish to britzpetermann" description="">
 		<ftp password="${bpm_pass}" server="britzpetermann.com" userid="${bpm_user}" verbose="yes" remotedir="/subdomains/static/httpdocs/experiments/akemi">
 			<fileset dir="${basedir}/../release" />
+		</ftp>
+	</target>
+	
+	<target name="publish to britzpetermann - no media" description="">
+		<ftp password="${bpm_pass}" server="britzpetermann.com" userid="${bpm_user}" verbose="yes" remotedir="/subdomains/static/httpdocs/experiments/akemi">
+			<fileset dir="${basedir}/../release">
+				<exclude name="**/*.mp3"/>
+				<exclude name="**/*.ogg"/>
+				<exclude name="**/*.png"/>
+				<exclude name="**/*.jpg"/>
+			</fileset>
 		</ftp>
 	</target>
 </project>

@@ -39,7 +39,6 @@ class CommonModel
 		cameraMatrix.lookAt(new Vec3(0,0,0), new Vec3(0,0,-15), new Vec3(0,1,0));
 		
 		modeChangeSignaler = new DirectSignaler(this);
-		
 	}
 	
 	public function toggleMode()
