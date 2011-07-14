@@ -1511,15 +1511,6 @@ sa.Main = function(canvas) { if( canvas === $_ ) return; {
 }}
 sa.Main.__name__ = ["sa","Main"];
 sa.Main.globalErrorHandler = function(msg,stack) {
-	haxe.Log.trace("Uncaugt error: " + msg,{ fileName : "Main.hx", lineNumber : 9, className : "sa.Main", methodName : "globalErrorHandler"});
-	{
-		var _g = 0;
-		while(_g < stack.length) {
-			var line = stack[_g];
-			++_g;
-			haxe.Log.trace(line,{ fileName : "Main.hx", lineNumber : 11, className : "sa.Main", methodName : "globalErrorHandler"});
-		}
-	}
 	return true;
 }
 sa.Main.main = function() {
@@ -2848,9 +2839,7 @@ GLAnimationFrame.run = function(method,ms) {
 		catch( $e0 ) {
 			{
 				var e = $e0;
-				{
-					haxe.Log.trace("Error executing GLAnimationFrame: " + e,{ fileName : "GLAnimationFrame.hx", lineNumber : 16, className : "GLAnimationFrame", methodName : "run"});
-				}
+				null;
 			}
 		}
 	}

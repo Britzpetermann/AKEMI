@@ -13,7 +13,7 @@ class GLAnimationFrame
 			}
 			catch(e : Dynamic)
 			{
-				trace("Error executing GLAnimationFrame: " + e);
+				//trace("Error executing GLAnimationFrame: " + e);
 			}
 		}
 		if (ms == 0)
