@@ -9,7 +9,7 @@ class Main
         //trace("Uncaugt error: " + msg);
         //for(line in stack)
         //	trace(line);
-        	
+       	
         return true;
     }
     
