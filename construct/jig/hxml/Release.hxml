@@ -1,17 +1,14 @@
 -js release/bin/Main.js
 -main sa.Main
--debug
 -cp construct/src
 -cp construct/src_extern
 -cp construct/src_bpmjs
 -cp construct/src_bpmgl
 -lib hsl-1
--D nosound
 
 --next
 
 -js release/bin/TestRunner.js
 -main TestRunner
--debug
 -cp construct/src_test
 -cp construct/src_bpmjs

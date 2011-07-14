@@ -29,7 +29,9 @@ class AudioController implements Infos
 	@MessageHandler
 	public function handleLauncherStart(event : LauncherStart)
 	{
-		audio.play();
+		#if !nosound
+			audio.play();
+		#end
 		var timer = new Timer(Std.int(1000 / 30));
 		timer.run = handleTimer;
 	}

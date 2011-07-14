@@ -13,8 +13,6 @@ class CreditsRenderer
 	public var projectionMatrix : Matrix4;
 	public var cameraMatrix : Matrix4;
 
-	static var DEBUG_DRAW_HITAREAS = false;
-
 	var gl : WebGLRenderingContext;
 
 	var shaderProgram : WebGLProgram;
@@ -79,13 +77,12 @@ class CreditsRenderer
 		projectionMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "projectionMatrix");
 		viewWorldMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "viewWorldMatrix");
 
-		if (DEBUG_DRAW_HITAREAS)
-		{
+		#if debug
 			shaderProgramButton = GLUtil.createProgram(gl, sa.view.shader.HitareaVertex.create(), sa.view.shader.UniformColor.create());
 			projectionMatrixButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "projectionMatrix");
 			viewWorldMatrixButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "viewWorldMatrix");
 			colorButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "color");
-		}
+		#end
 
 		GLMouseRegistry.getInstance().mouseDownSignaler.bind(mouseDown);
 		GLMouseRegistry.getInstance().mouseMoveSignaler.bind(mouseMove);
@@ -128,11 +125,10 @@ class CreditsRenderer
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-		if (DEBUG_DRAW_HITAREAS)
-		{
+		#if debug
 			gl.useProgram(shaderProgramButton);
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-		}
+		#end
 
 		cursorClient.defaultCursor();
 		for (button in buttons)
@@ -144,30 +140,32 @@ class CreditsRenderer
 			viewWorldMatrixButton.appendTranslation(button.pos.x, button.pos.y, 0);
 			viewWorldMatrixButton.appendScale(button.size.x, button.size.y, 1);
 
-			if (DEBUG_DRAW_HITAREAS)
-			{
+			#if debug
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
 				gl.uniformMatrix4fv(projectionMatrixButtonUniform, false, projectionMatrix.buffer);
 				gl.uniformMatrix4fv(viewWorldMatrixButtonUniform, false, viewWorldMatrixButton.buffer);
-			}
+			#end
 
 			if (isUnderMouse(viewWorldMatrixButton))
 			{
 				cursorClient.handCursor(button.url);
 				button.isActive = true;
-				if (DEBUG_DRAW_HITAREAS)
+				#if debug
 					gl.uniform4f(colorButtonUniform, 1, 1, 1, 0.2);
+				#end
 			}
 			else
 			{
 				button.isActive = false;
-				if (DEBUG_DRAW_HITAREAS)
+				#if debug
 					gl.uniform4f(colorButtonUniform, 1, 1, 1, 0.1);
+				#end
 			}
 
-			if (DEBUG_DRAW_HITAREAS)
+			#if debug
 				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			#end
 		}
 
 		gl.disable(gl.BLEND);

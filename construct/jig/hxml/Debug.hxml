@@ -6,7 +6,6 @@
 -cp construct/src_bpmjs
 -cp construct/src_bpmgl
 -lib hsl-1
--D nosound
 
 --next
 

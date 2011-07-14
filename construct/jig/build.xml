@@ -1,0 +1,22 @@
+<project name="AKEMI" basedir="../../">
+
+	<target name="Compile Debug" description="">
+		<config name="Debug"/>
+	</target>
+
+	<target name="Compile DebugNoSound" description="">
+		<config name="DebugNoSound"/>
+	</target>
+
+	<target name="Compile Release" description="">
+		<config name="Release"/>
+	</target>
+
+	<macrodef name="config">
+		<attribute name="name"/>
+		<sequential>
+			<echo message="Create Config: @{name}"/>
+			<copy file="construct/jig/hxml/@{name}.hxml" tofile="project.hxml" overwrite="true"/>
+		</sequential>
+	</macrodef>
+</project>
