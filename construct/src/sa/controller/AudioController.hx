@@ -14,18 +14,18 @@ class AudioController implements Infos
 
 	var audio : Audio;
 	var peaks : Array<Float>;
-	
+
 	public function new()
 	{
 		audio = cast Lib.document.getElementById("audio");
 		untyped audio.loop = "loop";
-		
+
 		untyped
 		{
 			this.peaks = peak;
 		}
 	}
-	
+
 	@MessageHandler
 	public function handleLauncherStart(event : LauncherStart)
 	{
@@ -33,7 +33,7 @@ class AudioController implements Infos
 		var timer = new Timer(Std.int(1000 / 30));
 		timer.run = handleTimer;
 	}
-	
+
 	function handleTimer()
 	{
 		var frame : Int = Math.round(audio.currentTime * 1000 / 30);

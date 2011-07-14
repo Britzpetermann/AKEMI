@@ -10,7 +10,7 @@ class KulerSets
 		kuler[4].fromHex(0xd9a5a0);
 		return kuler;
 	}
-	
+
 	public static function SpaceWater()
 	{
 		var kuler = new Kuler();
@@ -21,7 +21,7 @@ class KulerSets
 		kuler[4].fromHex(0x73a68e);
 		return kuler;
 	}
-	
+
 	public static function Funky()
 	{
 		var kuler = new Kuler();

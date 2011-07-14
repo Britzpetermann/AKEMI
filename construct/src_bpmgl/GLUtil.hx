@@ -4,46 +4,46 @@ class GLUtil
 	{
 		var gl = canvas.getContext("experimental-webgl", {antialias : antialias});
 		if (gl == null)
-        {
-            throw "Could not initialise WebGL.";
-        }
-        return gl;
+		{
+			throw "Could not initialise WebGL.";
+		}
+		return gl;
 	}
-	
+
 	public static function createProgram(gl : WebGLRenderingContext, vertexSource : String, fragmentSource : String) : WebGLProgram
 	{
 		var shaderProgram = gl.createProgram();
-		
+
 		var vs = gl.createShader(gl.VERTEX_SHADER);
 		gl.shaderSource(vs, vertexSource);
-        gl.compileShader(vs);
+		gl.compileShader(vs);
 		if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS))
-            throw gl.getShaderInfoLog(vs);
-                
+			throw gl.getShaderInfoLog(vs);
+
 		var fs = gl.createShader(gl.FRAGMENT_SHADER);
 		gl.shaderSource(fs, fragmentSource);
-        gl.compileShader(fs);
+		gl.compileShader(fs);
 		if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS))
-            throw gl.getShaderInfoLog(fs);
-        
-        gl.attachShader(shaderProgram, vs);
-        gl.attachShader(shaderProgram, fs);
-        gl.linkProgram(shaderProgram);
+			throw gl.getShaderInfoLog(fs);
 
-        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
-            throw "Could not link shader!";
-        
-        return shaderProgram;
+		gl.attachShader(shaderProgram, vs);
+		gl.attachShader(shaderProgram, fs);
+		gl.linkProgram(shaderProgram);
+
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+			throw "Could not link shader!";
+
+		return shaderProgram;
 	}
-	
+
 	public static function createInt8VertexBuffer(gl : WebGLRenderingContext, vertexes : Array<Int>) : WebGLBuffer
 	{
 		var vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(vertexes), gl.STATIC_DRAW);
-        return vertexBuffer;
+		gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(vertexes), gl.STATIC_DRAW);
+		return vertexBuffer;
 	}
-	
+
 	public static function getUniformLocation(gl : WebGLRenderingContext, shaderProgram : WebGLProgram, name : String)
 	{
 		var result = gl.getUniformLocation(shaderProgram, name);
@@ -51,7 +51,7 @@ class GLUtil
 			trace ("Could not find " + name + " in shader");
 		return result;
 	}
-	
+
 	public static function loadFonts(fonts : Array<String>, complete : Void->Void)
 	{
 		untyped
@@ -62,14 +62,14 @@ class GLUtil
 						complete();
 					},
 				};
-						
+
 			var wf = document.createElement('script');
-	        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-	            '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-	        wf.type = 'text/javascript';
-	        wf.async = 'true';
-	        var s = document.getElementsByTagName('script')[0];
-	        s.parentNode.insertBefore(wf, s);			
+			wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+				'://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+			wf.type = 'text/javascript';
+			wf.async = 'true';
+			var s = document.getElementsByTagName('script')[0];
+			s.parentNode.insertBefore(wf, s);
 		}
-	}	
+	}
 }

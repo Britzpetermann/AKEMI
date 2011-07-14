@@ -20,7 +20,7 @@ class MoveSet
 		var timeScaleInt = Std.int(timeScale);
 		if (timeScaleInt < 1)
 			timeScaleInt = 1;
-			
+
 		for(i in 0... timeScaleInt)
 		{
 		var moveSet : MoveSet = this;

@@ -35,12 +35,12 @@ extern class CanvasRenderingContext2D {
 	var shadowOffsetY:Float; // (default 0)
 	var shadowBlur:Float; // (default 0)
 	var shadowColor:String; // (default transparent black)
-	
+
 	// rects
 	function clearRect( x:Float, y:Float, w:Float, h:Float):Void;
 	function fillRect( x:Float, y:Float, w:Float, h:Float):Void;
 	function strokeRect( x:Float, y:Float, w:Float, h:Float):Void;
-	
+
 	// path API
 	function beginPath():Void;
 	function closePath():Void;
@@ -55,7 +55,7 @@ extern class CanvasRenderingContext2D {
 	function stroke():Void;
 	function clip():Void;
 	function isPointInPath( x:Float, y:Float):Bool;
-	
+
 	// text
 	var font:String; // (default 10px sans-serif)
 	var textAlign:String; // "start", "end", "left", "right", "center" (default: "start")
@@ -63,10 +63,10 @@ extern class CanvasRenderingContext2D {
 	function fillText( text:String, x:Float, y:Float, ?maxWidth:Float):Void;
 	function strokeText( text:String, x:Float, y:Float, ?maxWidth:Float):Void;
 	function measureText( text:String ):TextMetrics;
-	
+
 	// drawing images
 	function drawImage( image:Dynamic, sx:Float, sy:Float, ?sw:Float, ?sh:Float, ?dx:Float, ?dy:Float, ?dw:Float, ?dh:Float):Void;
-	
+
 	// pixel manipulation
 	function createImageData(sw:Float, sh:Float):ImageData;
 	function getImageData(sx:Float, sy:Float, sw:Float, sh:Float):ImageData;

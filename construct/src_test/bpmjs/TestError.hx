@@ -3,7 +3,7 @@ import TestRunner;
 
 class TestError extends SummerTestCase
 {
-	
+
 	public function testContextNotNull()
 	{
 		try
@@ -15,7 +15,7 @@ class TestError extends SummerTestCase
 			noFail();
 			return;
 		}
-		
+
 		fail("Expected Error");
 	}
 }

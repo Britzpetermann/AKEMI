@@ -3,11 +3,11 @@ typedef GLfloat = Float;
 typedef GLint = Float;
 typedef GLuint = Float;
 typedef GLsizei = Float;
-typedef GLclampf = Float;  
-typedef GLenum = Int;  
-typedef DOMString = String;  
-typedef GLbitfield = Int;  
-typedef GLsizeiptr = Int;  
+typedef GLclampf = Float;
+typedef GLenum = Int;
+typedef DOMString = String;
+typedef GLbitfield = Int;
+typedef GLsizeiptr = Int;
 
 extern class WebGLRenderingContext
 {
@@ -52,22 +52,22 @@ extern class WebGLRenderingContext
 	var UNSIGNED_BYTE : GLenum;
 	var VERTEX_SHADER : GLenum;
 	var ZERO : GLenum;
-	
+
 	var NEAREST_MIPMAP_NEAREST : GLenum;
-    var NEAREST_MIPMAP_LINEAR : GLenum;
-    var LINEAR_MIPMAP_NEAREST : GLenum;
-    var LINEAR_MIPMAP_LINEAR : GLenum;
-	
+	var NEAREST_MIPMAP_LINEAR : GLenum;
+	var LINEAR_MIPMAP_NEAREST : GLenum;
+	var LINEAR_MIPMAP_LINEAR : GLenum;
+
 	function activeTexture(texture : GLenum) : Void;
 	function attachShader(program : WebGLProgram, shader : WebGLShader) : Void;
-	
+
 	function bindBuffer(target : GLenum, buffer : WebGLBuffer) : Void;
 	function bindFramebuffer(target : GLenum, framebuffer : WebGLFramebuffer) : Void;
 	function bindRenderbuffer(target : GLenum, renderbuffer : WebGLRenderbuffer) : Void;
 	function bindTexture(target:GLenum, texture:WebGLTexture) : Void;
 	function blendFunc(sfactor : GLenum, dfactor : GLenum) : Void;
 	function bufferData(target : GLenum, data : ArrayBuffer , usage : GLenum ) : Void;
-	
+
 	function clear(mask : GLbitfield) : Void;
 	function clearColor(red : GLclampf, green : GLclampf, blue : GLclampf, alpha : GLclampf) : Void;
 	function clearDepth(depth : GLclampf) : Void;
@@ -76,61 +76,61 @@ extern class WebGLRenderingContext
 	function createFramebuffer() : WebGLFramebuffer;
 	function createProgram() : WebGLProgram;
 	function createRenderbuffer() : WebGLRenderbuffer;
-	function createTexture() : WebGLTexture;	
+	function createTexture() : WebGLTexture;
 	function createShader(type : GLenum) : WebGLShader;
-	
+
 	function disable(cap : GLenum):Void;
 	function drawArrays(mode : GLenum, first : GLint, count : GLsizei) : Void;
-	
+
 	function enable(cap : GLenum):Void;
 	function enableVertexAttribArray(index : GLuint) : Void;
-	
+
 	function framebufferRenderbuffer(target : GLenum, attachment : GLenum, renderbuffertarget : GLenum, renderbuffer : WebGLRenderbuffer) : Void;
 	function framebufferTexture2D(target : GLenum, attachment : GLenum, textarget : GLenum, texture : WebGLTexture, level : GLint) : Void;
-	
+
 	function generateMipmap(target : GLenum) : Void;
 	function getAttribLocation(program : WebGLProgram, name : DOMString) : GLint;
 	function getShaderInfoLog(shader : WebGLShader) : DOMString;
 	function getShaderParameter(shader : WebGLShader, pname : GLenum) : Dynamic;
 	function getProgramParameter(program : WebGLProgram, pname : GLenum) : Dynamic;
 	function linkProgram(program : WebGLProgram) : Void;
-	
+
 	function renderbufferStorage(target : GLenum, internalformat : GLenum, width : GLsizei, height : GLsizei) : Void;
 	function shaderSource(shader : WebGLShader, source : DOMString) : Void;
-	
+
 	inline function texImage2DArrayBufferView(target : GLenum, level : GLint, internalformat : GLenum, width : GLsizei, height : GLsizei, border : GLint, format : GLenum, type : GLenum, pixels : ArrayBufferView) : Void
 	{
 		untyped this.texImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	}
-	
-    inline function texImage2DImageData(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, pixels : ImageData) : Void
+
+	inline function texImage2DImageData(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, pixels : ImageData) : Void
 	{
 		untyped this.texImage2D(target, level, internalformat, format, type, pixels);
 	}
-    
-    inline function texImage2DImage(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, image : Image) : Void
+
+	inline function texImage2DImage(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, image : Image) : Void
 	{
 		untyped this.texImage2D(target, level, internalformat, format, type, image);
 	}
-	
-    inline function texImage2DCanvas(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, canvas : Canvas) : Void
+
+	inline function texImage2DCanvas(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, canvas : Canvas) : Void
 	{
 		untyped this.texImage2D(target, level, internalformat, format, type, canvas);
 	}
-	
-    inline function texImage2DVideo(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, video : Video) : Void
+
+	inline function texImage2DVideo(target : GLenum, level : GLint, internalformat : GLenum, format : GLenum, type : GLenum, video : Video) : Void
 	{
 		untyped this.texImage2D(target, level, internalformat, format, type, video);
 	}
-					
-	function texParameteri(target : GLenum, pname : GLenum, param : GLint) : Void; 
-	
+
+	function texParameteri(target : GLenum, pname : GLenum, param : GLint) : Void;
+
 	function useProgram(program : WebGLProgram) : Void;
-	
+
 	function vertexAttribPointer(indx : GLuint, size : GLint, type:GLenum, normalized : GLboolean, stride : GLsizei, offset : GLsizeiptr) : Void;
-	
+
 	function viewport(x : GLint, y : GLint, width : GLsizei, height : GLsizei) : Void;
-	
+
 	public function getActiveUniform(program:GLuint, index:GLuint):WebGLActiveInfo;
 	public function getUniformLocation(program:WebGLProgram, name:String):WebGLUniformLocation;
 	public function uniform1f(location:WebGLUniformLocation, x:GLfloat):Void;
@@ -152,5 +152,5 @@ extern class WebGLRenderingContext
 	public function uniformMatrix2fv(location:WebGLUniformLocation, transpose:GLboolean, value:Float32Array):Void;
 	public function uniformMatrix3fv(location:WebGLUniformLocation, transpose:GLboolean, value:Float32Array):Void;
 	public function uniformMatrix4fv(location:WebGLUniformLocation, transpose:GLboolean, value:Float32Array):Void;
-	public function getUniform(program:WebGLProgram, location:WebGLUniformLocation):Dynamic;	
+	public function getUniform(program:WebGLProgram, location:WebGLUniformLocation):Dynamic;
 }

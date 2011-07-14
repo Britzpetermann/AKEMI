@@ -8,7 +8,7 @@ class Kuler implements ArrayAccess<Color>
 		this[3] = new Color(Math.random(), Math.random(), Math.random());
 		this[4] = new Color(Math.random(), Math.random(), Math.random());
 	}
-	
+
 	public function scaleRGB(factor : Float)
 	{
 		this[0].scaleRGB(factor);

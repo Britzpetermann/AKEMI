@@ -23,40 +23,40 @@ class StageResizeAction extends EventDispatcher, implements Infos
 	{
 		updateSize();
 	}
-	
+
 	@MessageHandler
 	public function handleLauncherStart(event : LauncherStart)
 	{
 		GLAnimationFrame.run(timerUpdate);
-		Lib.window.onresize = onResize;		
+		Lib.window.onresize = onResize;
 	}
-	
+
 	function timerUpdate()
 	{
 		if (commonModel.windowWidth != Lib.window.innerWidth || commonModel.windowHeight != Lib.window.innerHeight)
 			onResize();
 	}
-	
+
 	function onResize(?event : Event)
 	{
 		updateSize();
 		fireUpdate();
 	}
-	
+
 	function updateSize()
 	{
-		commonModel.windowWidth = Std.int(Lib.window.innerWidth); 
+		commonModel.windowWidth = Std.int(Lib.window.innerWidth);
 		commonModel.windowHeight = Std.int(Lib.window.innerHeight);
-		
+
 		var aspect = commonModel.windowWidth / commonModel.windowHeight;
 		var fov = (aspect - 1.6) * 10;
 		if (fov < -30)
 			fov = -30;
 		commonModel.projectionMatrix.perspective(40 - fov, aspect, 0.1, 500.0);
-		
+
 		GLDisplayList.getDefault().setStageSize(commonModel.windowWidth, commonModel.windowHeight);
 	}
-	
+
 	private function fireUpdate()
 	{
 		dispatchEvent(new StageResize());

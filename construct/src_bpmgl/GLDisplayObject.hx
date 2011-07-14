@@ -6,13 +6,13 @@ import hsl.haxe.Signaler;
 class GLDisplayObject
 {
 	private static var nextId : Int;
-	 
+
 	public var id : Int;
-	
+
 	public var stage : GLStage;
-	
+
 	public var skipDraw : Bool;
-	
+
 	public var alpha : Float;
 	public var x(default, setX) : Float;
 	public var y(default, setY) : Float;
@@ -20,32 +20,32 @@ class GLDisplayObject
 	public var height(default, setHeight) : Float;
 	public var scaleX(default, setScaleX) : Float;
 	public var scaleY(default, setScaleY) : Float;
-	
+
 	public var transformIsInvalid : Bool;
 	public var canvasIsInvalid : Bool;
-	
+
 	public var canvas(getCanvas, null) : Canvas;
 	public var context(getContext, null) : CanvasRenderingContext2D;
-	
+
 	public var matrix : Matrix4;
 
 	public var enterFrameSignaler : Signaler<GLFrame>;
-		
+
 	public function new()
 	{
 		if (nextId == null)
 			nextId = 0;
 		id = nextId;
 		nextId++;
-		
+
 		GLDisplayList.getDefault().initDisplayObject(this);
-		
+
 		skipDraw = false;
-		
+
 		alpha = 1;
-		
+
 		matrix = new Matrix4();
-		
+
 		x = 0;
 		y = 0;
 		width = 256;
@@ -53,18 +53,18 @@ class GLDisplayObject
 		scaleX = 1;
 		scaleY = 1;
 		transformIsInvalid = true;
-		
+
 		canvas = cast Lib.document.createElement("canvas");
-    	canvas.width = width;
-    	canvas.height = height;
-    	
-    	var context = canvas.getContext("2d");
-    	context.fillStyle = "rgba(0, 0, 0, 0.0)";
+		canvas.width = width;
+		canvas.height = height;
+
+		var context = canvas.getContext("2d");
+		context.fillStyle = "rgba(0, 0, 0, 0.0)";
 		context.fillRect (0, 0, width, height);
-    	
-    	canvasIsInvalid = true;
+
+		canvasIsInvalid = true;
 	}
-	
+
 	public function validateTransform()
 	{
 		if (transformIsInvalid)
@@ -73,21 +73,21 @@ class GLDisplayObject
 
 			if (canvas.width != width)
 				canvas.width = width;
-				
+
 			if (canvas.height != height)
 				canvas.height = height;
-				
+
 			matrix.identity();
 			matrix.appendTranslation(x, y, 0);
 			matrix.appendScale(scaleX, scaleY, 1);
 		}
 	}
-	
+
 	public function toString()
 	{
 		return "DisplayObject: " + id;
 	}
-	
+
 	function setX(?value : Float)
 	{
 		if (x != value)
@@ -97,7 +97,7 @@ class GLDisplayObject
 		}
 		return value;
 	}
-	
+
 	function setY(?value : Float)
 	{
 		if (y != value)
@@ -107,7 +107,7 @@ class GLDisplayObject
 		}
 		return value;
 	}
-	
+
 	function setScaleX(?value : Float)
 	{
 		if (scaleX != value)
@@ -117,7 +117,7 @@ class GLDisplayObject
 		}
 		return value;
 	}
-	
+
 	function setScaleY(?value : Float)
 	{
 		if (scaleY != value)
@@ -127,7 +127,7 @@ class GLDisplayObject
 		}
 		return value;
 	}
-	
+
 	function setWidth(?value : Float)
 	{
 		if (width != value)
@@ -138,7 +138,7 @@ class GLDisplayObject
 		}
 		return value;
 	}
-	
+
 	function setHeight(?value : Float)
 	{
 		if (height != value)
@@ -149,13 +149,13 @@ class GLDisplayObject
 		}
 		return value;
 	}
-	
+
 	function getCanvas()
 	{
 		validateTransform();
 		return canvas;
 	}
-	
+
 	function getContext()
 	{
 		validateTransform();

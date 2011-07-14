@@ -4,12 +4,12 @@ class PreloaderView
 {
 	public var current : Int;
 	public var max : Int;
-	
+
 	public function new()
 	{
 		current = 0;
 	}
-	
+
 	public function start(message : String)
 	{
 		message = "";
@@ -22,19 +22,19 @@ class PreloaderView
 			else
 				dots += "-";
 		}
-		
+
 		untyped
 		{
 			document.getElementById("preloader").innerHTML = "Loading " + dots + " " + message + "";
-		}			
+		}
 	}
-	
+
 	public function complete()
 	{
 		if (current == max)
 			untyped
 			{
 				document.getElementById("preloader").innerHTML = "";
-			}			
+			}
 	}
 }

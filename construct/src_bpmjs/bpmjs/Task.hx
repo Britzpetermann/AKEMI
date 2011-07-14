@@ -9,14 +9,14 @@ class Task<T>
 	public var startSignaler : Signaler<T>;
 	public var completeSignaler : Signaler<T>;
 	public var errorSignaler : Signaler<TaskError<T>>;
-	
+
 	public function new()
 	{
 		startSignaler = new DirectSignaler(this);
 		completeSignaler = new DirectSignaler(this);
 		errorSignaler = new DirectSignaler(this);
 	}
-	
+
 	public function start(?positionInformation:haxe.PosInfos)
 	{
 		try
@@ -34,13 +34,13 @@ class Task<T>
 	public function doStart()
 	{
 	}
-	
+
 	public function complete()
 	{
 		var t : T = cast this;
 		completeSignaler.dispatch(t);
 	}
-	
+
 	public function error(result : T, error : String)
 	{
 		var taskError = new TaskError<T>();

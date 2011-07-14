@@ -4,11 +4,11 @@ package sa.view.shader; class UniformColor { public static function create() {re
 		precision highp float;
 	#endif
 
-	uniform vec4 color;	
+	uniform vec4 color;
 
 	void main(void)
 	{
-   		gl_FragColor = color;
+		gl_FragColor = color;
 	}
 
 ";}}

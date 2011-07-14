@@ -6,19 +6,19 @@ class Context
 {
 	public var contextConfig : ContextConfig;
 	public var objects : Array<ContextObject>;
-	
+
 	public function new()
 	{
-		 objects = new Array();
+		objects = new Array();
 	}
-	
+
 	public function addObject(name, type, object)
 	{
 		var contextObject = new ContextObject(name, type, object);
 		objects.push(contextObject);
 		return contextObject;
 	}
-	
+
 	public function getObjectByName(name) : Dynamic
 	{
 		for(contextObject in objects)
@@ -28,7 +28,7 @@ class Context
 		}
 		return null;
 	}
-	
+
 	public function getObjectByType<T>(type : Class<T>) : Dynamic
 	{
 		for(contextObject in objects)
@@ -45,11 +45,11 @@ class ContextObject
 	public var name : String;
 	public var type : Class<Dynamic>;
 	public var object : Dynamic;
-	
+
 	public function new(name, type, object)
 	{
-		 this.name = name;
-		 this.type = type;
-		 this.object = object;
-	}	
+		this.name = name;
+		this.type = type;
+		this.object = object;
+	}
 }

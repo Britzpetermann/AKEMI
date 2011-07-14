@@ -24,7 +24,7 @@ class GLAnimationFrame
 				window.mozRequestAnimationFrame ||
 				window.oRequestAnimationFrame ||
 				window.msRequestAnimationFrame);
-		
+
 			if (requestAnimationFrame == null)
 			{
 				function requester()
@@ -42,7 +42,7 @@ class GLAnimationFrame
 		}
 		else
 		{
-        	var timer = new Timer(Std.int(1000 / ms));
+			var timer = new Timer(Std.int(1000 / ms));
 			timer.run = secureMethod;
 		}
 	}
