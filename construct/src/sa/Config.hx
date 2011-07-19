@@ -56,7 +56,7 @@ class Config implements Infos
 	{
 		commonModel = new CommonModel();
 		commonModel.canvas = untyped Lib.document.getElementById("content");
-		commonModel.gl = GLUtil.initGL(commonModel.canvas, true);
+		commonModel.gl = GL.initGL(commonModel.canvas, true);
 		commonModel.windowWidth = Std.int(Lib.window.innerWidth / 2 * 2);
 		commonModel.windowHeight = Std.int(Lib.window.innerHeight / 2 * 2);
 		commonModel.showScene = false;

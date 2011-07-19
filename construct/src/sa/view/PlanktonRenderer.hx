@@ -21,14 +21,14 @@ class PlanktonRenderer
 	var vertexBuffer : WebGLBuffer;
 
 	var shaderProgram : WebGLProgram;
-	var perspectiveMatrixUniform : WebGLUniformLocation;
-	var objectMatrixUniform : WebGLUniformLocation;
-	var rotationMatrixUniform : WebGLUniformLocation;
-	var cameraMatrixUniform : WebGLUniformLocation;
-	var elapsedTimeUniform : WebGLUniformLocation;
-	var attractorPositionUniform : WebGLUniformLocation;
-	var peakIncrementUniform : WebGLUniformLocation;
-	var peakUniform : WebGLUniformLocation;
+	var perspectiveMatrixUniform : GLUniformLocation;
+	var objectMatrixUniform : GLUniformLocation;
+	var rotationMatrixUniform : GLUniformLocation;
+	var cameraMatrixUniform : GLUniformLocation;
+	var elapsedTimeUniform : GLUniformLocation;
+	var attractorPositionUniform : GLUniformLocation;
+	var peakIncrementUniform : GLUniformLocation;
+	var peakUniform : GLUniformLocation;
 
 	var vertexes : Float32Array;
 
@@ -66,19 +66,19 @@ class PlanktonRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PlanktonVertex, sa.view.shader.Color);
+		shaderProgram = GL.createProgram(sa.view.shader.PlanktonVertex, sa.view.shader.Color);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 
-		perspectiveMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "perspectiveMatrix");
-		objectMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "objectMatrix");
-		rotationMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "rotationMatrix");
-		cameraMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "cameraMatrix");
-		elapsedTimeUniform = GLUtil.getUniformLocation(gl, shaderProgram, "elapsedTime");
-		attractorPositionUniform = GLUtil.getUniformLocation(gl, shaderProgram, "attractorPosition");
-		peakUniform = GLUtil.getUniformLocation(gl, shaderProgram, "peak");
-		peakIncrementUniform = GLUtil.getUniformLocation(gl, shaderProgram, "peakIncrement");
+		perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
+		objectMatrixUniform = GL.getUniformLocation("objectMatrix");
+		rotationMatrixUniform = GL.getUniformLocation("rotationMatrix");
+		cameraMatrixUniform = GL.getUniformLocation("cameraMatrix");
+		elapsedTimeUniform = GL.getUniformLocation("elapsedTime");
+		attractorPositionUniform = GL.getUniformLocation("attractorPosition");
+		peakUniform = GL.getUniformLocation("peak");
+		peakIncrementUniform = GL.getUniformLocation("peakIncrement");
 
 		calculatePositions();
 
@@ -142,14 +142,14 @@ class PlanktonRenderer
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-		gl.uniformMatrix4fv(perspectiveMatrixUniform, false, projectionMatrix.buffer);
-		gl.uniformMatrix4fv(objectMatrixUniform, false, objectMatrix.buffer);
-		gl.uniformMatrix4fv(cameraMatrixUniform, false, cameraMatrix.buffer);
-		gl.uniformMatrix4fv(rotationMatrixUniform, false, rotationM.buffer);
-		gl.uniform1f(elapsedTimeUniform, elapsedTime);
-		gl.uniform1f(peakIncrementUniform, peakIncrement);
-		gl.uniform1f(peakUniform, peak);
-		gl.uniform3f(attractorPositionUniform, attractorPosition.x, attractorPosition.y, attractorPosition.z);
+		gl.uniformMatrix4fv(perspectiveMatrixUniform.location, false, projectionMatrix.buffer);
+		gl.uniformMatrix4fv(objectMatrixUniform.location, false, objectMatrix.buffer);
+		gl.uniformMatrix4fv(cameraMatrixUniform.location, false, cameraMatrix.buffer);
+		gl.uniformMatrix4fv(rotationMatrixUniform.location, false, rotationM.buffer);
+		gl.uniform1f(elapsedTimeUniform.location, elapsedTime);
+		gl.uniform1f(peakIncrementUniform.location, peakIncrement);
+		gl.uniform1f(peakUniform.location, peak);
+		gl.uniform3f(attractorPositionUniform.location, attractorPosition.x, attractorPosition.y, attractorPosition.z);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);

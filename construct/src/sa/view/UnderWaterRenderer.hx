@@ -8,8 +8,8 @@ class UnderWaterRenderer
 	var vertexPositionAttribute : Float;
 	var vertexBuffer : WebGLBuffer;
 
-	var elapsedTimeUniform : WebGLUniformLocation;
-	var perspectiveMatrixUniform : WebGLUniformLocation;
+	var elapsedTimeUniform : GLUniformLocation;
+	var perspectiveMatrixUniform : GLUniformLocation;
 
 	var startTime : Float;
 
@@ -22,7 +22,7 @@ class UnderWaterRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex, sa.view.shader.UnderWater);
+		shaderProgram = GL.createProgram(sa.view.shader.PassVertex, sa.view.shader.UnderWater);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
@@ -40,8 +40,8 @@ class UnderWaterRenderer
 		];
 		gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(vertices), gl.STATIC_DRAW);
 
-		elapsedTimeUniform = GLUtil.getUniformLocation(gl, shaderProgram, "elapsedTime");
-		perspectiveMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "perspectiveMatrix");
+		elapsedTimeUniform = GL.getUniformLocation("elapsedTime");
+		perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
 
 		startTime = Date.now().getTime();
 	}
@@ -57,11 +57,11 @@ class UnderWaterRenderer
 		gl.viewport(0, 0, width, height);
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 
-		gl.uniform1f(elapsedTimeUniform, elapsedTime);
+		gl.uniform1f(elapsedTimeUniform.location, elapsedTime);
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
 
-		gl.uniformMatrix4fv(perspectiveMatrixUniform, false, matrix.buffer);
+		gl.uniformMatrix4fv(perspectiveMatrixUniform.location, false, matrix.buffer);
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 	}
