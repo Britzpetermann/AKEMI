@@ -10,8 +10,8 @@ class TextureRenderer
 	var vertexPositionAttribute : Float;
 	var vertexBuffer : WebGLBuffer;
 
-	var textureUniform : WebGLUniformLocation;
-	var perspectiveMatrixUniform : WebGLUniformLocation;
+	var textureUniform : GLUniformLocation;
+	var perspectiveMatrixUniform : GLUniformLocation;
 
 	public function new(){}
 
@@ -19,22 +19,22 @@ class TextureRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex, sa.view.shader.Texture);
+		shaderProgram = GL.createProgram(sa.view.shader.PassVertex, sa.view.shader.Texture);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 
-		vertexBuffer = GLUtil.createInt8VertexBuffer(gl, [
+		vertexBuffer = GL.createArrayBuffer(new Int8Array([
 			-1, -1,
 			1, -1,
 			-1,  1,
 			1, -1,
 			-1,  1,
 			1,  1,
-		]);
+		]));
 
-		textureUniform = GLUtil.getUniformLocation(gl, shaderProgram, "texture");
-		perspectiveMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "perspectiveMatrix");
+		textureUniform = GL.getUniformLocation("texture");
+		perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
 	}
 
 	public function render(width : Float, height : Float)
@@ -52,9 +52,9 @@ class TextureRenderer
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.uniform1i(textureUniform, 0);
+		gl.uniform1i(textureUniform.location, 0);
 
-		gl.uniformMatrix4fv(perspectiveMatrixUniform, false, matrix.buffer);
+		gl.uniformMatrix4fv(perspectiveMatrixUniform.location, false, matrix.buffer);
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 	}

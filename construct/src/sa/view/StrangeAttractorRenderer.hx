@@ -13,8 +13,6 @@ class StrangeAttractorRenderer
 	var defaultZ : Float;
 	var numParticles : Int;
 
-	var gl : WebGLRenderingContext;
-
 	var objectMatrix : Matrix4;
 	var shadowMatrix : Matrix4;
 
@@ -25,17 +23,17 @@ class StrangeAttractorRenderer
 	var colorBuffer : WebGLBuffer;
 
 	var shaderProgram : WebGLProgram;
-	var perspectiveMatrixUniform : WebGLUniformLocation;
-	var objectMatrixUniform : WebGLUniformLocation;
-	var cameraMatrixUniform : WebGLUniformLocation;
-	var shadowMatrixUniform : WebGLUniformLocation;
-	var elapsedTimeUniform : WebGLUniformLocation;
-	var specularColorUniform1 : WebGLUniformLocation;
-	var specularColorUniform2 : WebGLUniformLocation;
-	var clickColorUniform : WebGLUniformLocation;
-	var elapsedClickTimeUniform : WebGLUniformLocation;
-	var clickPosUniform : WebGLUniformLocation;
-	var peakUniform : WebGLUniformLocation;
+	var perspectiveMatrixUniform : GLUniformLocation;
+	var objectMatrixUniform : GLUniformLocation;
+	var cameraMatrixUniform : GLUniformLocation;
+	var shadowMatrixUniform : GLUniformLocation;
+	var elapsedTimeUniform : GLUniformLocation;
+	var specularColorUniform1 : GLUniformLocation;
+	var specularColorUniform2 : GLUniformLocation;
+	var clickColorUniform : GLUniformLocation;
+	var elapsedClickTimeUniform : GLUniformLocation;
+	var clickPosUniform : GLUniformLocation;
+	var peakUniform : GLUniformLocation;
 
 	var vertexes : Float32Array;
 	var colors : Float32Array;
@@ -93,23 +91,24 @@ class StrangeAttractorRenderer
 
 	public function init(gl : WebGLRenderingContext)
 	{
-		this.gl = gl;
+		var gl = GL.gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.StrangeAttractorVertex, sa.view.shader.Color);
+		shaderProgram = GL.createProgram(sa.view.shader.StrangeAttractorVertex, sa.view.shader.Color);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		colorAttribute = gl.getAttribLocation(shaderProgram, "icolor");
-		perspectiveMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "perspectiveMatrix");
-		objectMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "objectMatrix");
-		cameraMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "cameraMatrix");
-		shadowMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "shadowMatrix");
-		elapsedTimeUniform = GLUtil.getUniformLocation(gl, shaderProgram, "elapsedTime");
-		specularColorUniform1 = GLUtil.getUniformLocation(gl, shaderProgram, "specularColor1");
-		specularColorUniform2 = GLUtil.getUniformLocation(gl, shaderProgram, "specularColor2");
-		clickColorUniform = GLUtil.getUniformLocation(gl, shaderProgram, "clickColor");
-		elapsedClickTimeUniform = GLUtil.getUniformLocation(gl, shaderProgram, "elapsedClickTime");
-		clickPosUniform = GLUtil.getUniformLocation(gl, shaderProgram, "clickPos");
-		peakUniform = GLUtil.getUniformLocation(gl, shaderProgram, "peak");
+
+		perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
+		objectMatrixUniform = GL.getUniformLocation("objectMatrix");
+		cameraMatrixUniform = GL.getUniformLocation("cameraMatrix");
+		shadowMatrixUniform = GL.getUniformLocation("shadowMatrix");
+		elapsedTimeUniform = GL.getUniformLocation("elapsedTime");
+		specularColorUniform1 = GL.getUniformLocation("specularColor1");
+		specularColorUniform2 = GL.getUniformLocation("specularColor2");
+		clickColorUniform = GL.getUniformLocation("clickColor");
+		elapsedClickTimeUniform = GL.getUniformLocation("elapsedClickTime");
+		clickPosUniform = GL.getUniformLocation("clickPos");
+		peakUniform = GL.getUniformLocation("peak");
 
 		updateMode(0);
 
@@ -134,6 +133,8 @@ class StrangeAttractorRenderer
 	function updateParticleMode()
 	{
 		calculatePositions();
+
+		var gl = GL.gl;
 
 		vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -189,6 +190,8 @@ class StrangeAttractorRenderer
 
 	public function render(width : Float, height : Float)
 	{
+		var gl = GL.gl;
+
 		if (positionMoveSet.current.z >= defaultZ - 3)
 			rotationMoveSpeed = 0.001;
 
@@ -215,7 +218,7 @@ class StrangeAttractorRenderer
 
 		shadowMatrix.appendRotation(frameTime * 0.0001, {x : 0.0, y : 1.0, z : Math.sin(-elapsedTime / 5000)});
 
-		gl.useProgram(shaderProgram);
+		GL.useProgram(shaderProgram);
 
 		gl.enableVertexAttribArray(colorAttribute);
 		gl.enableVertexAttribArray(vertexPositionAttribute);
@@ -226,22 +229,25 @@ class StrangeAttractorRenderer
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-		gl.uniformMatrix4fv(perspectiveMatrixUniform, false, projectionMatrix.buffer);
-		gl.uniformMatrix4fv(objectMatrixUniform, false, objectMatrix.buffer);
-		gl.uniformMatrix4fv(shadowMatrixUniform, false, shadowMatrix.buffer);
-		gl.uniformMatrix4fv(cameraMatrixUniform, false, cameraMatrix.buffer);
-		gl.uniform1f(elapsedTimeUniform, elapsedTime);
-		gl.uniform1f(peakUniform, softPeak);
-		gl.uniform1f(elapsedClickTimeUniform, elapsedClickTime);
-		gl.uniform3f(clickPosUniform, clickPos.x, clickPos.y, clickPos.z);
-		gl.uniform3f(specularColorUniform1, kuler[2].r, kuler[2].g, kuler[2].b);
-		gl.uniform3f(specularColorUniform2, kuler[3].r, kuler[3].g, kuler[3].b);
-		gl.uniform3f(clickColorUniform, kuler[4].r, kuler[4].g, kuler[4].b);
+		perspectiveMatrixUniform.setMatrix4(projectionMatrix);
+		objectMatrixUniform.setMatrix4(objectMatrix);
+		shadowMatrixUniform.setMatrix4(shadowMatrix);
+		cameraMatrixUniform.setMatrix4(cameraMatrix);
+
+		elapsedTimeUniform.uniform1f(elapsedTime);
+		peakUniform.uniform1f(softPeak);
+		elapsedClickTimeUniform.uniform1f(elapsedClickTime);
+		clickPosUniform.setVec3(clickPos);
+		specularColorUniform1.setRGB(kuler[2]);
+		specularColorUniform2.setRGB(kuler[3]);
+		clickColorUniform.setRGB(kuler[4]);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+		gl.enableVertexAttribArray(vertexPositionAttribute);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+		gl.enableVertexAttribArray(colorAttribute);
 		gl.vertexAttribPointer(colorAttribute, 3, gl.FLOAT, false, 0, 0);
 
 		if (mode != 2)

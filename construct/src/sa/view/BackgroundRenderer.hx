@@ -8,60 +8,56 @@ class BackgroundRenderer
 	public var projectionMatrix : Matrix4;
 	public var cameraMatrix : Matrix4;
 
-	var gl : WebGLRenderingContext;
-
 	var shaderProgram : WebGLProgram;
 	var vertexPositionAttribute : Float;
 	var vertexBuffer : WebGLBuffer;
 
-	var textureUniform : WebGLUniformLocation;
-	var projectionMatrixUniform : WebGLUniformLocation;
-	var viewWorldMatrixUniform : WebGLUniformLocation;
+	var textureUniform : GLUniformLocation;
+	var projectionMatrixUniform : GLUniformLocation;
+	var viewWorldMatrixUniform : GLUniformLocation;
 
 	public function new() {}
 
-	public function init(gl : WebGLRenderingContext)
+	public function init()
 	{
-		this.gl = gl;
+		shaderProgram = GL.createProgram(sa.view.shader.PassVertex2, sa.view.shader.Texture);
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2, sa.view.shader.Texture);
+		vertexPositionAttribute = GL.getAttribLocation(shaderProgram, "vertexPosition");
+		GL.enableVertexAttribArray(vertexPositionAttribute);
 
-		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-		gl.enableVertexAttribArray(vertexPositionAttribute);
-
-		vertexBuffer = GLUtil.createInt8VertexBuffer(gl, [
+		vertexBuffer = GL.createArrayBuffer(new Int8Array([
 			1, -1,
 			-1,  1,
 			-1, -1,
 			1, -1,
 			1,  1,
 			-1,  1,
-		]);
+		]));
 
-		textureUniform = GLUtil.getUniformLocation(gl, shaderProgram, "texture");
-		projectionMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "projectionMatrix");
-		viewWorldMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "viewWorldMatrix");
+		textureUniform = GL.getUniformLocation("texture");
+		projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
+		viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
 	}
 
 	public function render(width : Float, height : Float)
 	{
-		gl.useProgram(shaderProgram);
-		gl.viewport(0, 0, width, height);
+		GL.useProgram(shaderProgram);
+		GL.viewport(0, 0, width, height);
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-		gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
-		gl.uniformMatrix4fv(projectionMatrixUniform, false, projectionMatrix.buffer);
+		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+		GL.vertexAttribPointer(vertexPositionAttribute, 2, GL.BYTE, false, 0, 0);
+		projectionMatrixUniform.setMatrix4(projectionMatrix);
 
 		var viewWorldMatrix = new Matrix4(cameraMatrix);
 		viewWorldMatrix.appendScale(1,-1,1);
 		viewWorldMatrix.appendTranslation(0, 0, -40);
 		viewWorldMatrix.appendScale(80, 80, 1);
-		gl.uniformMatrix4fv(viewWorldMatrixUniform, false, viewWorldMatrix.buffer);
+		viewWorldMatrixUniform.uniformMatrix4fv(viewWorldMatrix.buffer);
 
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, texture.texture);
-		gl.uniform1i(textureUniform, 0);
+		GL.activeTexture(GL.TEXTURE0);
+		GL.bindTexture(GL.TEXTURE_2D, texture.texture);
+		textureUniform.uniform1i(0);
 
-		gl.drawArrays(gl.TRIANGLES, 0, 6);
+		GL.drawArrays(GL.TRIANGLES, 0, 6);
 	}
 }

@@ -20,12 +20,12 @@ class CreditsRenderer
 	var vertexPositionAttribute : Float;
 	var vertexBuffer : WebGLBuffer;
 
-	var textureUniform : WebGLUniformLocation;
-	var projectionMatrixUniform : WebGLUniformLocation;
-	var viewWorldMatrixUniform : WebGLUniformLocation;
-	var projectionMatrixButtonUniform : WebGLUniformLocation;
-	var viewWorldMatrixButtonUniform : WebGLUniformLocation;
-	var colorButtonUniform : WebGLUniformLocation;
+	var textureUniform : GLUniformLocation;
+	var projectionMatrixUniform : GLUniformLocation;
+	var viewWorldMatrixUniform : GLUniformLocation;
+	var projectionMatrixButtonUniform : GLUniformLocation;
+	var viewWorldMatrixButtonUniform : GLUniformLocation;
+	var colorButtonUniform : GLUniformLocation;
 
 	var moveSet : MoveSet;
 	var defaultTargetIn : Float;
@@ -62,26 +62,26 @@ class CreditsRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2, sa.view.shader.Texture);
+		shaderProgram = GL.createProgram(sa.view.shader.PassVertex2, sa.view.shader.Texture);
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
-		vertexBuffer = GLUtil.createInt8VertexBuffer(gl, [
+		vertexBuffer = GL.createArrayBuffer(new Int8Array([
 			1, -1,
 			-1,  1,
 			-1, -1,
 			1, -1,
 			1,  1,
 			-1,  1,
-		]);
-		textureUniform = GLUtil.getUniformLocation(gl, shaderProgram, "texture");
-		projectionMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "projectionMatrix");
-		viewWorldMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "viewWorldMatrix");
+		]));
+		textureUniform = GL.getUniformLocation("texture");
+		projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
+		viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
 
 		#if debug
-			shaderProgramButton = GLUtil.createProgram(gl, sa.view.shader.HitareaVertex, sa.view.shader.UniformColor);
-			projectionMatrixButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "projectionMatrix");
-			viewWorldMatrixButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "viewWorldMatrix");
-			colorButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "color");
+			shaderProgramButton = GL.createProgram(sa.view.shader.HitareaVertex, sa.view.shader.UniformColor);
+			projectionMatrixButtonUniform = GL.getUniformLocation("projectionMatrix");
+			viewWorldMatrixButtonUniform = GL.getUniformLocation("viewWorldMatrix");
+			colorButtonUniform = GL.getUniformLocation("color");
 		#end
 
 		GLMouseRegistry.getInstance().mouseDownSignaler.bind(mouseDown);
@@ -109,7 +109,7 @@ class CreditsRenderer
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
-		gl.uniformMatrix4fv(projectionMatrixUniform, false, projectionMatrix.buffer);
+		gl.uniformMatrix4fv(projectionMatrixUniform.location, false, projectionMatrix.buffer);
 
 		var scale = computeScale(width, height);
 		var viewWorldMatrix = new Matrix4(cameraMatrix);
@@ -117,11 +117,11 @@ class CreditsRenderer
 		viewWorldMatrix.appendTranslation(0, moveSet.current, -7);
 		viewWorldMatrix.appendScale(scale, scale, 1);
 
-		gl.uniformMatrix4fv(viewWorldMatrixUniform, false, viewWorldMatrix.buffer);
+		gl.uniformMatrix4fv(viewWorldMatrixUniform.location, false, viewWorldMatrix.buffer);
 
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, texture.texture);
-		gl.uniform1i(textureUniform, 0);
+		gl.uniform1i(textureUniform.location, 0);
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -143,8 +143,8 @@ class CreditsRenderer
 			#if debug
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
-				gl.uniformMatrix4fv(projectionMatrixButtonUniform, false, projectionMatrix.buffer);
-				gl.uniformMatrix4fv(viewWorldMatrixButtonUniform, false, viewWorldMatrixButton.buffer);
+				gl.uniformMatrix4fv(projectionMatrixButtonUniform.location, false, projectionMatrix.buffer);
+				gl.uniformMatrix4fv(viewWorldMatrixButtonUniform.location, false, viewWorldMatrixButton.buffer);
 			#end
 
 			if (isUnderMouse(viewWorldMatrixButton))
@@ -152,14 +152,14 @@ class CreditsRenderer
 				cursorClient.handCursor(button.url);
 				button.isActive = true;
 				#if debug
-					gl.uniform4f(colorButtonUniform, 1, 1, 1, 0.2);
+					gl.uniform4f(colorButtonUniform.location, 1, 1, 1, 0.2);
 				#end
 			}
 			else
 			{
 				button.isActive = false;
 				#if debug
-					gl.uniform4f(colorButtonUniform, 1, 1, 1, 0.1);
+					gl.uniform4f(colorButtonUniform.location, 1, 1, 1, 0.1);
 				#end
 			}
 

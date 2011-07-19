@@ -30,7 +30,7 @@ class Launcher extends EventDispatcher, implements Infos
 	{
 		preloaderView.start("Fonts");
 
-		//GLUtil.loadFonts([""], fontsLoaded);
+		//GL.loadFonts([""], fontsLoaded);
 		fontsLoaded();
 	}
 

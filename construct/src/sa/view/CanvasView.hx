@@ -47,37 +47,37 @@ class CanvasView implements Infos
 		backgroundRenderer.texture = textureRegistry.get(TextureId.BACKGROUND);
 		backgroundRenderer.projectionMatrix = commonModel.projectionMatrix;
 		backgroundRenderer.cameraMatrix = commonModel.cameraMatrix;
-		backgroundRenderer.init(gl);
+		backgroundRenderer.init();
+
+		planktonRenderer = new PlanktonRenderer();
+		planktonRenderer.projectionMatrix = commonModel.projectionMatrix;
+		planktonRenderer.cameraMatrix = commonModel.cameraMatrix;
+		planktonRenderer.init();
 
 		creditsRenderer = new CreditsRenderer();
 		creditsRenderer.commonModel = commonModel;
 		creditsRenderer.texture = textureRegistry.get(TextureId.CREDITS);
 		creditsRenderer.projectionMatrix = commonModel.projectionMatrix;
 		creditsRenderer.cameraMatrix = commonModel.cameraMatrix;
-		creditsRenderer.init(gl);
+		//creditsRenderer.init(gl);
 
 		underWaterRenderer = new UnderWaterRenderer();
-		underWaterRenderer.init(gl);
+		//underWaterRenderer.init(gl);
 
 		textureRenderer = new TextureRenderer();
 		textureRenderer.texture = framebuffer.texture;
-		textureRenderer.init(gl);
+		//textureRenderer.init(gl);
 
 		saRenderer = new StrangeAttractorRenderer();
 		saRenderer.projectionMatrix = commonModel.projectionMatrix;
 		saRenderer.cameraMatrix = commonModel.cameraMatrix;
-		saRenderer.init(gl);
-
-		planktonRenderer = new PlanktonRenderer();
-		planktonRenderer.projectionMatrix = commonModel.projectionMatrix;
-		planktonRenderer.cameraMatrix = commonModel.cameraMatrix;
-		planktonRenderer.init(gl);
+		//saRenderer.init(gl);
 
 		rocksRenderer = new RocksRenderer();
 		rocksRenderer.textureRegistry = textureRegistry;
 		rocksRenderer.projectionMatrix = commonModel.projectionMatrix;
 		rocksRenderer.cameraMatrix = commonModel.cameraMatrix;
-		rocksRenderer.init(gl);
+		//rocksRenderer.init(gl);
 
 		displayListRenderer = new GLDisplayListRenderer();
 		displayListRenderer.init(gl);
@@ -113,7 +113,7 @@ class CanvasView implements Infos
 		Stats.measureFPS();
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.clearColor(0.1, 0.0, 0.1, 1.0);
+		gl.clearColor(0.0, 1.0, 0.0, 1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		if (commonModel.showScene)
@@ -133,6 +133,7 @@ class CanvasView implements Infos
 		planktonRenderer.attractorPosition = saRenderer.effectivePosition;
 		planktonRenderer.render(canvas.width, canvas.height);
 
+		return;
 		rocksRenderer.render(canvas.width, canvas.height);
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.framebuffer);

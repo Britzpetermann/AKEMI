@@ -12,8 +12,6 @@ class PlanktonRenderer
 	var numParticles : Int;
 	var numParticlesEachSide : Int;
 
-	var gl : WebGLRenderingContext;
-
 	var objectMatrix : Matrix4;
 	var shadowMatrix : Matrix4;
 
@@ -21,14 +19,14 @@ class PlanktonRenderer
 	var vertexBuffer : WebGLBuffer;
 
 	var shaderProgram : WebGLProgram;
-	var perspectiveMatrixUniform : WebGLUniformLocation;
-	var objectMatrixUniform : WebGLUniformLocation;
-	var rotationMatrixUniform : WebGLUniformLocation;
-	var cameraMatrixUniform : WebGLUniformLocation;
-	var elapsedTimeUniform : WebGLUniformLocation;
-	var attractorPositionUniform : WebGLUniformLocation;
-	var peakIncrementUniform : WebGLUniformLocation;
-	var peakUniform : WebGLUniformLocation;
+	var perspectiveMatrixUniform : GLUniformLocation;
+	var objectMatrixUniform : GLUniformLocation;
+	var rotationMatrixUniform : GLUniformLocation;
+	var cameraMatrixUniform : GLUniformLocation;
+	var elapsedTimeUniform : GLUniformLocation;
+	var attractorPositionUniform : GLUniformLocation;
+	var peakIncrementUniform : GLUniformLocation;
+	var peakUniform : GLUniformLocation;
 
 	var vertexes : Float32Array;
 
@@ -62,29 +60,25 @@ class PlanktonRenderer
 		clickPos = new Vec3();
 	}
 
-	public function init(gl : WebGLRenderingContext)
+	public function init()
 	{
-		this.gl = gl;
+		shaderProgram = GL.createProgram(sa.view.shader.PlanktonVertex, sa.view.shader.Color);
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PlanktonVertex, sa.view.shader.Color);
+		vertexPositionAttribute = GL.getAttribLocation(shaderProgram, "vertexPosition");
+		GL.enableVertexAttribArray(vertexPositionAttribute);
 
-		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-		gl.enableVertexAttribArray(vertexPositionAttribute);
-
-		perspectiveMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "perspectiveMatrix");
-		objectMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "objectMatrix");
-		rotationMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "rotationMatrix");
-		cameraMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "cameraMatrix");
-		elapsedTimeUniform = GLUtil.getUniformLocation(gl, shaderProgram, "elapsedTime");
-		attractorPositionUniform = GLUtil.getUniformLocation(gl, shaderProgram, "attractorPosition");
-		peakUniform = GLUtil.getUniformLocation(gl, shaderProgram, "peak");
-		peakIncrementUniform = GLUtil.getUniformLocation(gl, shaderProgram, "peakIncrement");
+		perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
+		objectMatrixUniform = GL.getUniformLocation("objectMatrix");
+		rotationMatrixUniform = GL.getUniformLocation("rotationMatrix");
+		cameraMatrixUniform = GL.getUniformLocation("cameraMatrix");
+		elapsedTimeUniform = GL.getUniformLocation("elapsedTime");
+		attractorPositionUniform = GL.getUniformLocation("attractorPosition");
+		peakUniform = GL.getUniformLocation("peak");
+		peakIncrementUniform = GL.getUniformLocation("peakIncrement");
 
 		calculatePositions();
 
-		vertexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, vertexes, gl.STATIC_DRAW);
+		vertexBuffer = GL.createArrayBuffer(vertexes);
 
 		startTime = Date.now().getTime();
 	}
@@ -115,6 +109,8 @@ class PlanktonRenderer
 
 	public function render(width : Float, height : Float)
 	{
+		//var gl = GL.gl;
+
 		peakIncrement += peak;
 		var time = Date.now().getTime();
 		var elapsedClickTime = time - clickTime;
@@ -128,34 +124,34 @@ class PlanktonRenderer
 		rotationM.appendEulerRotation(0.3, 0, 0);
 
 		objectMatrix.setFrom(cameraMatrix);
-		//objectMatrix.appendTranslation(40, 7, -120);
 		objectMatrix.appendTranslation(4, 2, -40);
 		objectMatrix.multiply(rotationM);
 		objectMatrix.appendTranslation(0, 7, 0);
 
 		shadowMatrix.appendRotation(frameTime * 0.0001, {x : 0.0, y : 1.0, z : Math.sin(-elapsedTime / 5000)});
 
-		gl.useProgram(shaderProgram);
+		GL.useProgram(shaderProgram);
 
-		gl.viewport(0, 0, width, height);
+		GL.viewport(0, 0, width, height);
 
-		gl.enable(gl.BLEND);
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+		GL.enable(GL.BLEND);
+		GL.blendFunc(GL.SRC_ALPHA, GL.ONE);
 
-		gl.uniformMatrix4fv(perspectiveMatrixUniform, false, projectionMatrix.buffer);
-		gl.uniformMatrix4fv(objectMatrixUniform, false, objectMatrix.buffer);
-		gl.uniformMatrix4fv(cameraMatrixUniform, false, cameraMatrix.buffer);
-		gl.uniformMatrix4fv(rotationMatrixUniform, false, rotationM.buffer);
-		gl.uniform1f(elapsedTimeUniform, elapsedTime);
-		gl.uniform1f(peakIncrementUniform, peakIncrement);
-		gl.uniform1f(peakUniform, peak);
-		gl.uniform3f(attractorPositionUniform, attractorPosition.x, attractorPosition.y, attractorPosition.z);
+		perspectiveMatrixUniform.setMatrix4(projectionMatrix);
+		objectMatrixUniform.setMatrix4(objectMatrix);
+		cameraMatrixUniform.setMatrix4(cameraMatrix);
+		rotationMatrixUniform.setMatrix4(rotationM);
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+		elapsedTimeUniform.uniform1f(elapsedTime);
+		peakIncrementUniform.uniform1f(peakIncrement);
+		peakUniform.uniform1f(peak);
+		attractorPositionUniform.setVec3(attractorPosition);
 
-		gl.drawArrays(gl.LINES, 0, numParticles);
+		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+		GL.vertexAttribPointer(vertexPositionAttribute, 3, GL.FLOAT, false, 0, 0);
 
-		gl.disable(gl.BLEND);
+		GL.drawArrays(GL.LINES, 0, numParticles);
+
+		GL.disable(GL.BLEND);
 	}
 }

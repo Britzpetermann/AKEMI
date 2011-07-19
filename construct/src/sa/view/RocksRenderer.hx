@@ -14,9 +14,9 @@ class RocksRenderer
 	var vertexPositionAttribute : Float;
 	var vertexBuffer : WebGLBuffer;
 
-	var textureUniform : WebGLUniformLocation;
-	var projectionMatrixUniform : WebGLUniformLocation;
-	var viewWorldMatrixUniform : WebGLUniformLocation;
+	var textureUniform : GLUniformLocation;
+	var projectionMatrixUniform : GLUniformLocation;
+	var viewWorldMatrixUniform : GLUniformLocation;
 
 	var first : Bool;
 	var lastFrameTime : Float;
@@ -46,23 +46,23 @@ class RocksRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2, sa.view.shader.Texture);
+		shaderProgram = GL.createProgram(sa.view.shader.PassVertex2, sa.view.shader.Texture);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 
-		vertexBuffer = GLUtil.createInt8VertexBuffer(gl, [
+		vertexBuffer = GL.createArrayBuffer(new Int8Array([
 			1, -1,
 			-1,  1,
 			-1, -1,
 			1, -1,
 			1,  1,
 			-1,  1,
-		]);
+		]));
 
-		textureUniform = GLUtil.getUniformLocation(gl, shaderProgram, "texture");
-		projectionMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "projectionMatrix");
-		viewWorldMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "viewWorldMatrix");
+		textureUniform = GL.getUniformLocation("texture");
+		projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
+		viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
 	}
 
 	public function render(width : Float, height : Float)
@@ -85,10 +85,10 @@ class RocksRenderer
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 		gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
-		gl.uniformMatrix4fv(projectionMatrixUniform, false, projectionMatrix.buffer);
+		gl.uniformMatrix4fv(projectionMatrixUniform.location, false, projectionMatrix.buffer);
 
 		gl.activeTexture(gl.TEXTURE0);
-		gl.uniform1i(textureUniform, 0);
+		gl.uniform1i(textureUniform.location, 0);
 
 		showTexture(TextureId.ROCK_RIGHT, 10, 0, -25, 25, 25);
 		showTexture(TextureId.STONES_RIGHT, 3, -5, -23, 4.5, 4.5, 0, 0, -45);
@@ -133,7 +133,7 @@ class RocksRenderer
 		if (rx != 0 || ry != 0 || rz != 0)
 			viewWorldMatrix.appendEulerRotation(ry, rz, rx);
 
-		gl.uniformMatrix4fv(viewWorldMatrixUniform, false, viewWorldMatrix.buffer);
+		gl.uniformMatrix4fv(viewWorldMatrixUniform.location, false, viewWorldMatrix.buffer);
 
 		var texture = textureRegistry.get(textureId).texture;
 		if (texture != lastTexture)

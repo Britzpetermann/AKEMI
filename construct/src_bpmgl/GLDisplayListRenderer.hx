@@ -8,11 +8,11 @@ class GLDisplayListRenderer
 	var vertexPositionAttribute : Float;
 	var vertexBuffer : WebGLBuffer;
 
-	var textureUniform : WebGLUniformLocation;
-	var projectionMatrixUniform : WebGLUniformLocation;
-	var objectMatrixUniform : WebGLUniformLocation;
-	var sizeUniform : WebGLUniformLocation;
-	var alphaUniform : WebGLUniformLocation;
+	var textureUniform : GLUniformLocation;
+	var projectionMatrixUniform : GLUniformLocation;
+	var objectMatrixUniform : GLUniformLocation;
+	var sizeUniform : GLUniformLocation;
+	var alphaUniform : GLUniformLocation;
 
 	var textures : IntHash<WebGLTexture>;
 
@@ -25,10 +25,10 @@ class GLDisplayListRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, shader.DisplayObjectVertex, shader.DisplayObjectFragment);
+		shaderProgram = GL.createProgram(shader.DisplayObjectVertex, shader.DisplayObjectFragment);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-		gl.enableVertexAttribArray(vertexPositionAttribute);
+		GL.enableVertexAttribArray(vertexPositionAttribute);
 
 		vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -41,11 +41,11 @@ class GLDisplayListRenderer
 		];
 		gl.bufferData(gl.ARRAY_BUFFER, new Int8Array(vertices), gl.STATIC_DRAW);
 
-		textureUniform = GLUtil.getUniformLocation(gl, shaderProgram, "texture");
-		projectionMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "projectionMatrix");
-		objectMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "objectMatrix");
-		sizeUniform = GLUtil.getUniformLocation(gl, shaderProgram, "size");
-		alphaUniform = GLUtil.getUniformLocation(gl, shaderProgram, "alpha");
+		textureUniform = GL.getUniformLocation("texture");
+		projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
+		objectMatrixUniform = GL.getUniformLocation("objectMatrix");
+		sizeUniform = GL.getUniformLocation("size");
+		alphaUniform = GL.getUniformLocation("alpha");
 	}
 
 	public function render(width : Float, height : Float)
@@ -61,12 +61,12 @@ class GLDisplayListRenderer
 
 		var projectionMatrix = new Matrix4();
 		projectionMatrix.ortho(0, width, height, 0, 0, 1);
-		gl.uniformMatrix4fv(projectionMatrixUniform, false, projectionMatrix.buffer);
+		gl.uniformMatrix4fv(projectionMatrixUniform.location, false, projectionMatrix.buffer);
 
 		var stage = GLDisplayList.getDefault().stage;
 
 		gl.activeTexture(gl.TEXTURE0);
-		gl.uniform1i(textureUniform, 0);
+		gl.uniform1i(textureUniform.location, 0);
 
 		renderRecursive(stage, new Matrix4());
 		gl.disable(gl.BLEND);
@@ -116,9 +116,9 @@ class GLDisplayListRenderer
 			displayObject.canvasIsInvalid = false;
 		}
 
-		gl.uniformMatrix4fv(objectMatrixUniform, false, result.buffer);
-		gl.uniform2f(sizeUniform, displayObject.width, displayObject.height);
-		gl.uniform1f(alphaUniform, displayObject.alpha);
+		gl.uniformMatrix4fv(objectMatrixUniform.location, false, result.buffer);
+		gl.uniform2f(sizeUniform.location, displayObject.width, displayObject.height);
+		gl.uniform1f(alphaUniform.location, displayObject.alpha);
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
