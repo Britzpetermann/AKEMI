@@ -133,8 +133,6 @@ class CanvasView implements Infos
 		planktonRenderer.attractorPosition = saRenderer.effectivePosition;
 		planktonRenderer.render(canvas.width, canvas.height);
 
-
-
 		return;
 
 		rocksRenderer.render(canvas.width, canvas.height);
