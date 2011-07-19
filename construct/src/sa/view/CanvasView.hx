@@ -71,7 +71,7 @@ class CanvasView implements Infos
 		saRenderer = new StrangeAttractorRenderer();
 		saRenderer.projectionMatrix = commonModel.projectionMatrix;
 		saRenderer.cameraMatrix = commonModel.cameraMatrix;
-		//saRenderer.init(gl);
+		saRenderer.init(gl);
 
 		rocksRenderer = new RocksRenderer();
 		rocksRenderer.textureRegistry = textureRegistry;
@@ -84,10 +84,10 @@ class CanvasView implements Infos
 
 		var inst = this;
 		GLTimeout.executeLater(1000, function()
-			{
-				inst.mainInterfaceView.start();
-				GLAnimationFrame.run(inst.tick);
-			});
+		{
+			inst.mainInterfaceView.start();
+			GLAnimationFrame.run(inst.tick);
+		});
 	}
 
 	function handleModeChanged(newMode : Int)
@@ -133,15 +133,13 @@ class CanvasView implements Infos
 		planktonRenderer.attractorPosition = saRenderer.effectivePosition;
 		planktonRenderer.render(canvas.width, canvas.height);
 
-		return;
-
-		rocksRenderer.render(canvas.width, canvas.height);
+		//rocksRenderer.render(canvas.width, canvas.height);
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.framebuffer);
 		gl.viewport(0, 0, framebuffer.width, framebuffer.height);
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT);
-		underWaterRenderer.render(framebuffer.width, framebuffer.height, 1);
+		//underWaterRenderer.render(framebuffer.width, framebuffer.height, 1);
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, canvas.width, canvas.height);
@@ -149,11 +147,11 @@ class CanvasView implements Infos
 		saRenderer.peak = commonModel.peak;
 		saRenderer.render(canvas.width, canvas.height);
 
-		creditsRenderer.render(canvas.width, canvas.height);
+		//creditsRenderer.render(canvas.width, canvas.height);
 
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-		textureRenderer.render(canvas.width, canvas.height);
+		//textureRenderer.render(canvas.width, canvas.height);
 		gl.disable(gl.BLEND);
 	}
 

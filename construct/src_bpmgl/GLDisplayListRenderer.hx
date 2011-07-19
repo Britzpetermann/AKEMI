@@ -28,11 +28,9 @@ class GLDisplayListRenderer
 		shaderProgram = GL.createProgram(shader.DisplayObjectVertex, shader.DisplayObjectFragment);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
-		GL.enableVertexAttribArray(vertexPositionAttribute);
 
 		vertexBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
 		var vertices : Array<Int> = [
 			0,  0,
 			1,  0,
@@ -50,13 +48,14 @@ class GLDisplayListRenderer
 
 	public function render(width : Float, height : Float)
 	{
-		gl.useProgram(shaderProgram);
+		GL.useProgram(shaderProgram);
 		gl.viewport(0, 0, width, height);
 
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+		GL.enableVertexAttribArray(vertexPositionAttribute);
 		gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
 
 		var projectionMatrix = new Matrix4();

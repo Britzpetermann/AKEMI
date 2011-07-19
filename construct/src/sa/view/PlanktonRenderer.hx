@@ -65,7 +65,6 @@ class PlanktonRenderer
 		shaderProgram = GL.createProgram(sa.view.shader.PlanktonVertex, sa.view.shader.Color);
 
 		vertexPositionAttribute = GL.getAttribLocation(shaderProgram, "vertexPosition");
-		GL.enableVertexAttribArray(vertexPositionAttribute);
 
 		perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
 		objectMatrixUniform = GL.getUniformLocation("objectMatrix");
@@ -148,6 +147,7 @@ class PlanktonRenderer
 		attractorPositionUniform.setVec3(attractorPosition);
 
 		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+		GL.enableVertexAttribArray(vertexPositionAttribute);
 		GL.vertexAttribPointer(vertexPositionAttribute, 3, GL.FLOAT, false, 0, 0);
 
 		GL.drawArrays(GL.LINES, 0, numParticles);

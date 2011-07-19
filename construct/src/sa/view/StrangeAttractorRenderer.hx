@@ -220,9 +220,6 @@ class StrangeAttractorRenderer
 
 		GL.useProgram(shaderProgram);
 
-		gl.enableVertexAttribArray(colorAttribute);
-		gl.enableVertexAttribArray(vertexPositionAttribute);
-
 		gl.viewport(0, 0, width, height);
 
 		gl.enable(gl.DEPTH_TEST);
@@ -243,11 +240,11 @@ class StrangeAttractorRenderer
 		clickColorUniform.setRGB(kuler[4]);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-		gl.enableVertexAttribArray(vertexPositionAttribute);
+		GL.enableVertexAttribArray(vertexPositionAttribute);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-		gl.enableVertexAttribArray(colorAttribute);
+		GL.enableVertexAttribArray(colorAttribute);
 		gl.vertexAttribPointer(colorAttribute, 3, gl.FLOAT, false, 0, 0);
 
 		if (mode != 2)

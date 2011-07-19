@@ -951,7 +951,6 @@ GLDisplayListRenderer.prototype.init = function(gl) {
 	this.gl = gl;
 	this.shaderProgram = GL.createProgram(shader.DisplayObjectVertex,shader.DisplayObjectFragment);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
-	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
 	var vertices = [0,0,1,0,0,1,1,1];
@@ -966,11 +965,12 @@ GLDisplayListRenderer.prototype.init = function(gl) {
 GLDisplayListRenderer.prototype.render = function(width,height) {
 	$s.push("GLDisplayListRenderer::render");
 	var $spos = $s.length;
-	this.gl.useProgram(this.shaderProgram);
+	GL.useProgram(this.shaderProgram);
 	this.gl.viewport(0,0,width,height);
 	this.gl.enable(this.gl.BLEND);
 	this.gl.blendFunc(this.gl.SRC_ALPHA,this.gl.ONE_MINUS_SRC_ALPHA);
 	this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.vertexBuffer);
+	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.gl.vertexAttribPointer(this.vertexPositionAttribute,2,this.gl.BYTE,false,0,0);
 	var projectionMatrix = new Matrix4();
 	projectionMatrix.ortho(0,width,height,0,0,1);
@@ -3216,7 +3216,6 @@ sa.view.BackgroundRenderer.prototype.init = function() {
 	var $spos = $s.length;
 	this.shaderProgram = GL.createProgram(sa.view.shader.PassVertex2,sa.view.shader.Texture);
 	this.vertexPositionAttribute = GL.gl.getAttribLocation(this.shaderProgram,"vertexPosition");
-	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = GL.createArrayBuffer(new Int8Array([1,-1,-1,1,-1,-1,1,-1,1,1,-1,1]));
 	this.textureUniform = GL.getUniformLocation("texture");
 	this.projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
@@ -3229,6 +3228,7 @@ sa.view.BackgroundRenderer.prototype.render = function(width,height) {
 	GL.useProgram(this.shaderProgram);
 	GL.gl.viewport(0,0,width,height);
 	GL.gl.bindBuffer(34962,this.vertexBuffer);
+	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	GL.gl.vertexAttribPointer(this.vertexPositionAttribute,2,5120,false,0,0);
 	GL.gl.uniformMatrix4fv(this.projectionMatrixUniform.location,false,this.projectionMatrix.buffer);
 	var viewWorldMatrix = new Matrix4(this.cameraMatrix);
@@ -5260,7 +5260,6 @@ sa.view.PlanktonRenderer.prototype.init = function() {
 	var $spos = $s.length;
 	this.shaderProgram = GL.createProgram(sa.view.shader.PlanktonVertex,sa.view.shader.Color);
 	this.vertexPositionAttribute = GL.gl.getAttribLocation(this.shaderProgram,"vertexPosition");
-	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
 	this.objectMatrixUniform = GL.getUniformLocation("objectMatrix");
 	this.rotationMatrixUniform = GL.getUniformLocation("rotationMatrix");
@@ -5330,6 +5329,7 @@ sa.view.PlanktonRenderer.prototype.render = function(width,height) {
 	GL.gl.uniform1f(this.peakUniform.location,this.peak);
 	this.attractorPositionUniform.setVec3(this.attractorPosition);
 	GL.gl.bindBuffer(34962,this.vertexBuffer);
+	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	GL.gl.vertexAttribPointer(this.vertexPositionAttribute,3,5126,false,0,0);
 	GL.gl.drawArrays(1,0,this.numParticles);
 	GL.gl.disable(3042);
@@ -6250,8 +6250,6 @@ sa.view.StrangeAttractorRenderer.prototype.render = function(width,height) {
 	this.objectMatrix.appendEulerRotation(this.rotationMoveSet.current.x + Math.sin(-elapsedTime / 2000) * 0.1,this.rotationMoveSet.current.y + Math.sin(-elapsedTime / 3300) * 0.1,this.rotationMoveSet.current.z + Math.sin(-elapsedTime / 4000) * 0.1);
 	this.shadowMatrix.appendRotation(frameTime * 0.0001,{ x : 0.0, y : 1.0, z : Math.sin(-elapsedTime / 5000)});
 	GL.useProgram(this.shaderProgram);
-	gl.enableVertexAttribArray(this.colorAttribute);
-	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	gl.viewport(0,0,width,height);
 	gl.enable(gl.DEPTH_TEST);
 	gl.enable(gl.BLEND);
@@ -6268,10 +6266,10 @@ sa.view.StrangeAttractorRenderer.prototype.render = function(width,height) {
 	this.specularColorUniform2.setRGB(this.kuler[3]);
 	this.clickColorUniform.setRGB(this.kuler[4]);
 	gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-	gl.enableVertexAttribArray(this.vertexPositionAttribute);
+	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	gl.vertexAttribPointer(this.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 	gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
-	gl.enableVertexAttribArray(this.colorAttribute);
+	GL.gl.enableVertexAttribArray(this.colorAttribute);
 	gl.vertexAttribPointer(this.colorAttribute,3,gl.FLOAT,false,0,0);
 	if(this.mode != 2) {
 		gl.drawArrays(gl.POINTS,0,this.numParticles);
@@ -6834,34 +6832,6 @@ sa.view.Flighter.prototype.scale = null;
 sa.view.Flighter.prototype.rnd1 = null;
 sa.view.Flighter.prototype.rnd2 = null;
 sa.view.Flighter.prototype.__class__ = sa.view.Flighter;
-sa.view.TextureId = { __ename__ : ["sa","view","TextureId"], __constructs__ : ["STRIPE1","STRIPE2","BACKGROUND","STONES_RIGHT","STONES_LEFT","ROCK_LEFT","ROCK_RIGHT","CREDITS","FLIGHTER"] }
-sa.view.TextureId.STRIPE1 = ["STRIPE1",0];
-sa.view.TextureId.STRIPE1.toString = $estr;
-sa.view.TextureId.STRIPE1.__enum__ = sa.view.TextureId;
-sa.view.TextureId.STRIPE2 = ["STRIPE2",1];
-sa.view.TextureId.STRIPE2.toString = $estr;
-sa.view.TextureId.STRIPE2.__enum__ = sa.view.TextureId;
-sa.view.TextureId.BACKGROUND = ["BACKGROUND",2];
-sa.view.TextureId.BACKGROUND.toString = $estr;
-sa.view.TextureId.BACKGROUND.__enum__ = sa.view.TextureId;
-sa.view.TextureId.STONES_RIGHT = ["STONES_RIGHT",3];
-sa.view.TextureId.STONES_RIGHT.toString = $estr;
-sa.view.TextureId.STONES_RIGHT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.STONES_LEFT = ["STONES_LEFT",4];
-sa.view.TextureId.STONES_LEFT.toString = $estr;
-sa.view.TextureId.STONES_LEFT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.ROCK_LEFT = ["ROCK_LEFT",5];
-sa.view.TextureId.ROCK_LEFT.toString = $estr;
-sa.view.TextureId.ROCK_LEFT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.ROCK_RIGHT = ["ROCK_RIGHT",6];
-sa.view.TextureId.ROCK_RIGHT.toString = $estr;
-sa.view.TextureId.ROCK_RIGHT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.CREDITS = ["CREDITS",7];
-sa.view.TextureId.CREDITS.toString = $estr;
-sa.view.TextureId.CREDITS.__enum__ = sa.view.TextureId;
-sa.view.TextureId.FLIGHTER = ["FLIGHTER",8];
-sa.view.TextureId.FLIGHTER.toString = $estr;
-sa.view.TextureId.FLIGHTER.__enum__ = sa.view.TextureId;
 if(typeof ease=='undefined') ease = {}
 ease.Quad = function() { }
 ease.Quad.__name__ = ["ease","Quad"];
@@ -6901,6 +6871,34 @@ ease.Quad.easeInOut = function(t,b,c,d) {
 	$s.pop();
 }
 ease.Quad.prototype.__class__ = ease.Quad;
+sa.view.TextureId = { __ename__ : ["sa","view","TextureId"], __constructs__ : ["STRIPE1","STRIPE2","BACKGROUND","STONES_RIGHT","STONES_LEFT","ROCK_LEFT","ROCK_RIGHT","CREDITS","FLIGHTER"] }
+sa.view.TextureId.STRIPE1 = ["STRIPE1",0];
+sa.view.TextureId.STRIPE1.toString = $estr;
+sa.view.TextureId.STRIPE1.__enum__ = sa.view.TextureId;
+sa.view.TextureId.STRIPE2 = ["STRIPE2",1];
+sa.view.TextureId.STRIPE2.toString = $estr;
+sa.view.TextureId.STRIPE2.__enum__ = sa.view.TextureId;
+sa.view.TextureId.BACKGROUND = ["BACKGROUND",2];
+sa.view.TextureId.BACKGROUND.toString = $estr;
+sa.view.TextureId.BACKGROUND.__enum__ = sa.view.TextureId;
+sa.view.TextureId.STONES_RIGHT = ["STONES_RIGHT",3];
+sa.view.TextureId.STONES_RIGHT.toString = $estr;
+sa.view.TextureId.STONES_RIGHT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.STONES_LEFT = ["STONES_LEFT",4];
+sa.view.TextureId.STONES_LEFT.toString = $estr;
+sa.view.TextureId.STONES_LEFT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.ROCK_LEFT = ["ROCK_LEFT",5];
+sa.view.TextureId.ROCK_LEFT.toString = $estr;
+sa.view.TextureId.ROCK_LEFT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.ROCK_RIGHT = ["ROCK_RIGHT",6];
+sa.view.TextureId.ROCK_RIGHT.toString = $estr;
+sa.view.TextureId.ROCK_RIGHT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.CREDITS = ["CREDITS",7];
+sa.view.TextureId.CREDITS.toString = $estr;
+sa.view.TextureId.CREDITS.__enum__ = sa.view.TextureId;
+sa.view.TextureId.FLIGHTER = ["FLIGHTER",8];
+sa.view.TextureId.FLIGHTER.toString = $estr;
+sa.view.TextureId.FLIGHTER.__enum__ = sa.view.TextureId;
 sa.view.shader.UnderWater = function() { }
 sa.view.shader.UnderWater.__name__ = ["sa","view","shader","UnderWater"];
 sa.view.shader.UnderWater.prototype.__class__ = sa.view.shader.UnderWater;
@@ -7148,6 +7146,7 @@ sa.view.CanvasView.prototype.handleLauncherStart = function(event) {
 	this.saRenderer = new sa.view.StrangeAttractorRenderer();
 	this.saRenderer.projectionMatrix = this.commonModel.projectionMatrix;
 	this.saRenderer.cameraMatrix = this.commonModel.cameraMatrix;
+	this.saRenderer.init(this.gl);
 	this.rocksRenderer = new sa.view.RocksRenderer();
 	this.rocksRenderer.textureRegistry = this.textureRegistry;
 	this.rocksRenderer.projectionMatrix = this.commonModel.projectionMatrix;
@@ -7204,24 +7203,16 @@ sa.view.CanvasView.prototype.renderScene = function() {
 	this.planktonRenderer.peak = this.commonModel.peak;
 	this.planktonRenderer.attractorPosition = this.saRenderer.effectivePosition;
 	this.planktonRenderer.render(this.canvas.width,this.canvas.height);
-	{
-		$s.pop();
-		return;
-	}
-	this.rocksRenderer.render(this.canvas.width,this.canvas.height);
 	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,this.framebuffer.framebuffer);
 	this.gl.viewport(0,0,this.framebuffer.width,this.framebuffer.height);
 	this.gl.clearColor(0.0,0.0,0.0,1.0);
 	this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-	this.underWaterRenderer.render(this.framebuffer.width,this.framebuffer.height,1);
 	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,null);
 	this.gl.viewport(0,0,this.canvas.width,this.canvas.height);
 	this.saRenderer.peak = this.commonModel.peak;
 	this.saRenderer.render(this.canvas.width,this.canvas.height);
-	this.creditsRenderer.render(this.canvas.width,this.canvas.height);
 	this.gl.enable(this.gl.BLEND);
 	this.gl.blendFunc(this.gl.SRC_ALPHA,this.gl.ONE);
-	this.textureRenderer.render(this.canvas.width,this.canvas.height);
 	this.gl.disable(this.gl.BLEND);
 	$s.pop();
 }
@@ -9913,7 +9904,7 @@ sa.view.shader.UnderWater.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\t
 sa.view.MainInterfaceView.__meta__ = { fields : { imageRegistry : { Inject : null}, commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}, handleStageResize : { MessageHandler : null}}};
 sa.view.MainInterfaceView.__rtti = "<class path=\"sa.view.MainInterfaceView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<imageRegistry><c path=\"GLImageRegistry\"/></imageRegistry>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<stage public=\"1\"><c path=\"GLStage\"/></stage>\n\t<blend><c path=\"GLDisplayObject\"/></blend>\n\t<startButton><c path=\"GLInteractiveObject\"/></startButton>\n\t<creditsButton><c path=\"GLInteractiveObject\"/></creditsButton>\n\t<modeButton><c path=\"GLInteractiveObject\"/></modeButton>\n\t<handleLauncherStart set=\"method\" line=\"37\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<start public=\"1\" set=\"method\" line=\"76\"><f a=\"\"><e path=\"Void\"/></f></start>\n\t<handleStartFadeInComplete set=\"method\" line=\"82\"><f a=\"tween\">\n\t<c path=\"GLTween\"/>\n\t<e path=\"Void\"/>\n</f></handleStartFadeInComplete>\n\t<handeClick set=\"method\" line=\"87\"><f a=\"?obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handeClick>\n\t<handleStartFadeOutComplete set=\"method\" line=\"101\"><f a=\"tween\">\n\t<c path=\"GLTween\"/>\n\t<e path=\"Void\"/>\n</f></handleStartFadeOutComplete>\n\t<handleCreditsButtonClick set=\"method\" line=\"112\"><f a=\"obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handleCreditsButtonClick>\n\t<handleModeButtonClick set=\"method\" line=\"117\"><f a=\"obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handleModeButtonClick>\n\t<handleStageResize set=\"method\" line=\"123\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<layoutElements set=\"method\" line=\"128\"><f a=\"\"><e path=\"Void\"/></f></layoutElements>\n\t<new public=\"1\" set=\"method\" line=\"31\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 sa.view.CanvasView.__meta__ = { fields : { commonModel : { Inject : null}, textureRegistry : { Inject : null}, mainInterfaceView : { Inject : null}, handleLauncherStart : { MessageHandler : null}, handleStageResize : { MessageHandler : null}}};
-sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<mainInterfaceView><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<gl><c path=\"WebGLRenderingContext\"/></gl>\n\t<canvas><c path=\"Canvas\"/></canvas>\n\t<framebuffer><c path=\"GLFramebuffer\"/></framebuffer>\n\t<backgroundRenderer><c path=\"sa.view.BackgroundRenderer\"/></backgroundRenderer>\n\t<underWaterRenderer><c path=\"sa.view.UnderWaterRenderer\"/></underWaterRenderer>\n\t<textureRenderer><c path=\"sa.view.TextureRenderer\"/></textureRenderer>\n\t<planktonRenderer><c path=\"sa.view.PlanktonRenderer\"/></planktonRenderer>\n\t<rocksRenderer><c path=\"sa.view.RocksRenderer\"/></rocksRenderer>\n\t<saRenderer><c path=\"sa.view.StrangeAttractorRenderer\"/></saRenderer>\n\t<displayListRenderer><c path=\"GLDisplayListRenderer\"/></displayListRenderer>\n\t<creditsRenderer><c path=\"sa.view.CreditsRenderer\"/></creditsRenderer>\n\t<handleLauncherStart set=\"method\" line=\"36\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleModeChanged set=\"method\" line=\"93\"><f a=\"newMode\">\n\t<c path=\"Int\"/>\n\t<e path=\"Void\"/>\n</f></handleModeChanged>\n\t<handleStageResize set=\"method\" line=\"99\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<updateCanvas set=\"method\" line=\"104\"><f a=\"\"><e path=\"Void\"/></f></updateCanvas>\n\t<tick set=\"method\" line=\"110\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<renderScene set=\"method\" line=\"127\"><f a=\"\"><e path=\"Void\"/></f></renderScene>\n\t<renderInterface set=\"method\" line=\"160\"><f a=\"\"><e path=\"Void\"/></f></renderInterface>\n\t<new public=\"1\" set=\"method\" line=\"33\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
+sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<mainInterfaceView><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<gl><c path=\"WebGLRenderingContext\"/></gl>\n\t<canvas><c path=\"Canvas\"/></canvas>\n\t<framebuffer><c path=\"GLFramebuffer\"/></framebuffer>\n\t<backgroundRenderer><c path=\"sa.view.BackgroundRenderer\"/></backgroundRenderer>\n\t<underWaterRenderer><c path=\"sa.view.UnderWaterRenderer\"/></underWaterRenderer>\n\t<textureRenderer><c path=\"sa.view.TextureRenderer\"/></textureRenderer>\n\t<planktonRenderer><c path=\"sa.view.PlanktonRenderer\"/></planktonRenderer>\n\t<rocksRenderer><c path=\"sa.view.RocksRenderer\"/></rocksRenderer>\n\t<saRenderer><c path=\"sa.view.StrangeAttractorRenderer\"/></saRenderer>\n\t<displayListRenderer><c path=\"GLDisplayListRenderer\"/></displayListRenderer>\n\t<creditsRenderer><c path=\"sa.view.CreditsRenderer\"/></creditsRenderer>\n\t<handleLauncherStart set=\"method\" line=\"36\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleModeChanged set=\"method\" line=\"93\"><f a=\"newMode\">\n\t<c path=\"Int\"/>\n\t<e path=\"Void\"/>\n</f></handleModeChanged>\n\t<handleStageResize set=\"method\" line=\"99\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<updateCanvas set=\"method\" line=\"104\"><f a=\"\"><e path=\"Void\"/></f></updateCanvas>\n\t<tick set=\"method\" line=\"110\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<renderScene set=\"method\" line=\"127\"><f a=\"\"><e path=\"Void\"/></f></renderScene>\n\t<renderInterface set=\"method\" line=\"158\"><f a=\"\"><e path=\"Void\"/></f></renderInterface>\n\t<new public=\"1\" set=\"method\" line=\"33\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 haxe.Timer.arr = new Array();
 shader.DisplayObjectVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 objectMatrix;\n\tuniform vec2 size;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = projectionMatrix * objectMatrix * (vec4(size, 1.0, 1.0) * vec4(vertexPosition, 0.0, 1.0));\n\t\ttextureCoord = vertexPosition.xy;\n\t}\n\n"]}};
 GL.DEPTH_BUFFER_BIT = 256;

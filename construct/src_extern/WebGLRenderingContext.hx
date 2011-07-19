@@ -88,6 +88,8 @@ extern class WebGLRenderingContext
 	function framebufferRenderbuffer(target : GLenum, attachment : GLenum, renderbuffertarget : GLenum, renderbuffer : WebGLRenderbuffer) : Void;
 	function framebufferTexture2D(target : GLenum, attachment : GLenum, textarget : GLenum, texture : WebGLTexture, level : GLint) : Void;
 
+	function getError() : GLenum;
+
 	function generateMipmap(target : GLenum) : Void;
 	function getAttribLocation(program : WebGLProgram, name : DOMString) : GLint;
 	function getShaderInfoLog(shader : WebGLShader) : DOMString;
@@ -153,4 +155,5 @@ extern class WebGLRenderingContext
 	public function uniformMatrix3fv(location:WebGLUniformLocation, transpose:GLboolean, value:Float32Array):Void;
 	public function uniformMatrix4fv(location:WebGLUniformLocation, transpose:GLboolean, value:Float32Array):Void;
 	public function getUniform(program:WebGLProgram, location:WebGLUniformLocation):Dynamic;
+
 }

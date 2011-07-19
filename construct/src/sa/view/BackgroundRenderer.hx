@@ -23,7 +23,6 @@ class BackgroundRenderer
 		shaderProgram = GL.createProgram(sa.view.shader.PassVertex2, sa.view.shader.Texture);
 
 		vertexPositionAttribute = GL.getAttribLocation(shaderProgram, "vertexPosition");
-		GL.enableVertexAttribArray(vertexPositionAttribute);
 
 		vertexBuffer = GL.createArrayBuffer(new Int8Array([
 			1, -1,
@@ -45,6 +44,7 @@ class BackgroundRenderer
 		GL.viewport(0, 0, width, height);
 
 		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+		GL.enableVertexAttribArray(vertexPositionAttribute);
 		GL.vertexAttribPointer(vertexPositionAttribute, 2, GL.BYTE, false, 0, 0);
 		projectionMatrixUniform.setMatrix4(projectionMatrix);
 
