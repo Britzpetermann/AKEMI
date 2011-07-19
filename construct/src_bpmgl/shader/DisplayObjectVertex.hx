@@ -1,4 +1,5 @@
-package shader; class DisplayObjectVertex { public static function create() {return "
+package shader;
+@GLSL("
 
 	attribute vec2 vertexPosition;
 
@@ -14,4 +15,4 @@ package shader; class DisplayObjectVertex { public static function create() {ret
 		textureCoord = vertexPosition.xy;
 	}
 
-";}}
+") class DisplayObjectVertex {}

@@ -1,4 +1,5 @@
-package shader; class DisplayObjectFragment { public static function create() {return "
+package shader;
+@GLSL("
 
 	#ifdef GL_ES
 		precision highp float;
@@ -15,4 +16,4 @@ package shader; class DisplayObjectFragment { public static function create() {r
 		gl_FragColor = color * vec4(1.0, 1.0, 1.0, alpha);
 	}
 
-";}}
+") class DisplayObjectFragment {}

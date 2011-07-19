@@ -24,7 +24,7 @@ class BackgroundRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2.create(), sa.view.shader.Texture.create());
+		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2, sa.view.shader.Texture);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
@@ -52,7 +52,7 @@ class BackgroundRenderer
 		gl.vertexAttribPointer(vertexPositionAttribute, 2, gl.BYTE, false, 0, 0);
 		gl.uniformMatrix4fv(projectionMatrixUniform, false, projectionMatrix.buffer);
 
-		   var viewWorldMatrix = new Matrix4(cameraMatrix);
+		var viewWorldMatrix = new Matrix4(cameraMatrix);
 		viewWorldMatrix.appendScale(1,-1,1);
 		viewWorldMatrix.appendTranslation(0, 0, -40);
 		viewWorldMatrix.appendScale(80, 80, 1);

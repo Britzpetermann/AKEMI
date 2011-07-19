@@ -1,4 +1,5 @@
-package sa.view.shader; class UniformColor { public static function create() {return "
+package sa.view.shader;
+@GLSL("
 
 	#ifdef GL_ES
 		precision highp float;
@@ -11,4 +12,4 @@ package sa.view.shader; class UniformColor { public static function create() {re
 		gl_FragColor = color;
 	}
 
-";}}
+") class UniformColor {}

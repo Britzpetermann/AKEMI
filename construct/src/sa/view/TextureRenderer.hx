@@ -19,7 +19,7 @@ class TextureRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex.create(), sa.view.shader.Texture.create());
+		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex, sa.view.shader.Texture);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);

@@ -1,4 +1,5 @@
-package sa.view.shader; class StrangeAttractorVertex { public static function create() {return "
+package sa.view.shader;
+@GLSL("
 
 	attribute vec3 vertexPosition;
 	attribute vec3 icolor;
@@ -80,4 +81,5 @@ package sa.view.shader; class StrangeAttractorVertex { public static function cr
 			clickColor * v * 0.5
 			, clamp(diffuse * 2.0, 0.5, 1.0));
 	}
-";}}
+
+") class StrangeAttractorVertex {}

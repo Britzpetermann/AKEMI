@@ -1,3 +1,5 @@
+import haxe.rtti.Meta;
+
 class GLUtil
 {
 	public static function initGL(canvas : Canvas, antialias : Bool) : WebGLRenderingContext
@@ -10,18 +12,18 @@ class GLUtil
 		return gl;
 	}
 
-	public static function createProgram(gl : WebGLRenderingContext, vertexSource : String, fragmentSource : String) : WebGLProgram
+	public static function createProgram(gl : WebGLRenderingContext, vertexSourceClass : Class<Dynamic>, fragmentSourceClass : Class<Dynamic>) : WebGLProgram
 	{
 		var shaderProgram = gl.createProgram();
 
 		var vs = gl.createShader(gl.VERTEX_SHADER);
-		gl.shaderSource(vs, vertexSource);
+		gl.shaderSource(vs, createGLSLFromClass(vertexSourceClass));
 		gl.compileShader(vs);
 		if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS))
 			throw gl.getShaderInfoLog(vs);
 
 		var fs = gl.createShader(gl.FRAGMENT_SHADER);
-		gl.shaderSource(fs, fragmentSource);
+		gl.shaderSource(fs, createGLSLFromClass(fragmentSourceClass));
 		gl.compileShader(fs);
 		if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS))
 			throw gl.getShaderInfoLog(fs);
@@ -34,6 +36,15 @@ class GLUtil
 			throw "Could not link shader!";
 
 		return shaderProgram;
+	}
+
+	public static function createGLSLFromClass(shaderClass : Class<Dynamic>)
+	{
+		var metaDatas = Meta.getType(shaderClass);
+		var glsl : Array<String> = Reflect.field(metaDatas, "GLSL");
+		if (glsl.length != 1)
+			throw "Missing GLSL metadata in shader class: " + shaderClass;
+		return glsl[0];
 	}
 
 	public static function createInt8VertexBuffer(gl : WebGLRenderingContext, vertexes : Array<Int>) : WebGLBuffer

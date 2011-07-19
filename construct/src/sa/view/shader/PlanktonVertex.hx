@@ -1,4 +1,5 @@
-package sa.view.shader; class PlanktonVertex { public static function create() {return "
+package sa.view.shader;
+@GLSL("
 
 	attribute vec3 vertexPosition;
 
@@ -78,4 +79,5 @@ package sa.view.shader; class PlanktonVertex { public static function create() {
 			colorSound * sinValue * 0.2 * value * (0.5 + peak)
 			, 1.0);
 	}
-";}}
+
+") class PlanktonVertex {}

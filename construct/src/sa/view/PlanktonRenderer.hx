@@ -66,7 +66,7 @@ class PlanktonRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PlanktonVertex.create(), sa.view.shader.Color.create());
+		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PlanktonVertex, sa.view.shader.Color);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);

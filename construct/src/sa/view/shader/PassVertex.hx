@@ -1,4 +1,5 @@
-package sa.view.shader; class PassVertex { public static function create() {return "
+package sa.view.shader;
+@GLSL("
 
 	attribute vec2 vertexPosition;
 
@@ -14,4 +15,4 @@ package sa.view.shader; class PassVertex { public static function create() {retu
 		textureCoord = (vertexPosition.xy + 1.0) * 0.5;
 	}
 
-";}}
+") class PassVertex {}

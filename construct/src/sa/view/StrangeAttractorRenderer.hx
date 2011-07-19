@@ -95,7 +95,7 @@ class StrangeAttractorRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.StrangeAttractorVertex.create(), sa.view.shader.Color.create());
+		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.StrangeAttractorVertex, sa.view.shader.Color);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		colorAttribute = gl.getAttribLocation(shaderProgram, "icolor");

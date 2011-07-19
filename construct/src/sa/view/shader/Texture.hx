@@ -1,4 +1,5 @@
-package sa.view.shader; class Texture { public static function create() {return "
+package sa.view.shader;
+@GLSL("
 
 	#ifdef GL_ES
 		precision highp float;
@@ -14,4 +15,4 @@ package sa.view.shader; class Texture { public static function create() {return 
 		gl_FragColor = color;
 	}
 
-";}}
+") class Texture {}

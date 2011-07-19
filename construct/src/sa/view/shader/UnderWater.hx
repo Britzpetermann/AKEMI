@@ -1,4 +1,5 @@
-package sa.view.shader; class UnderWater { public static function create() {return "
+package sa.view.shader;
+@GLSL("
 
 	#ifdef GL_ES
 		precision highp float;
@@ -43,4 +44,4 @@ package sa.view.shader; class UnderWater { public static function create() {retu
 		gl_FragColor = vec4(color, 1.0) * vec4(value, value, value, 1.0);
 	}
 
-";}}
+") class UnderWater {}

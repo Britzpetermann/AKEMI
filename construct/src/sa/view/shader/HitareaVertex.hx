@@ -1,4 +1,5 @@
-package sa.view.shader; class HitareaVertex { public static function create() {return "
+package sa.view.shader;
+@GLSL("
 
 	attribute vec2 vertexPosition;
 
@@ -10,4 +11,4 @@ package sa.view.shader; class HitareaVertex { public static function create() {r
 		gl_Position = projectionMatrix * viewWorldMatrix * vec4(vertexPosition, 0.0, 1.0);
 	}
 
-";}}
+") class HitareaVertex {}

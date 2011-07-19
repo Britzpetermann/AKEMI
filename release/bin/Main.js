@@ -949,37 +949,7 @@ GLDisplayListRenderer.prototype.init = function(gl) {
 	$s.push("GLDisplayListRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = gl.createProgram();
-	var vs = gl.createShader(gl.VERTEX_SHADER);
-	gl.shaderSource(vs,shader.DisplayObjectVertex.create());
-	gl.compileShader(vs);
-	if(!gl.getShaderParameter(vs,gl.COMPILE_STATUS)) {
-		haxe.Log.trace(gl.getShaderInfoLog(vs),{ fileName : "GLDisplayListRenderer.hx", lineNumber : 34, className : "GLDisplayListRenderer", methodName : "init"});
-		{
-			$s.pop();
-			return;
-		}
-	}
-	var fs = gl.createShader(gl.FRAGMENT_SHADER);
-	gl.shaderSource(fs,shader.DisplayObjectFragment.create());
-	gl.compileShader(fs);
-	if(!gl.getShaderParameter(fs,gl.COMPILE_STATUS)) {
-		haxe.Log.trace(gl.getShaderInfoLog(fs),{ fileName : "GLDisplayListRenderer.hx", lineNumber : 42, className : "GLDisplayListRenderer", methodName : "init"});
-		{
-			$s.pop();
-			return;
-		}
-	}
-	gl.attachShader(this.shaderProgram,vs);
-	gl.attachShader(this.shaderProgram,fs);
-	gl.linkProgram(this.shaderProgram);
-	if(!gl.getProgramParameter(this.shaderProgram,gl.LINK_STATUS)) {
-		haxe.Log.trace("Could not initialise shaders",{ fileName : "GLDisplayListRenderer.hx", lineNumber : 52, className : "GLDisplayListRenderer", methodName : "init"});
-		{
-			$s.pop();
-			return;
-		}
-	}
+	this.shaderProgram = GLUtil.createProgram(gl,shader.DisplayObjectVertex,shader.DisplayObjectFragment);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = gl.createBuffer();
@@ -1069,15 +1039,6 @@ if(!sa.view) sa.view = {}
 if(!sa.view.shader) sa.view.shader = {}
 sa.view.shader.PassVertex2 = function() { }
 sa.view.shader.PassVertex2.__name__ = ["sa","view","shader","PassVertex2"];
-sa.view.shader.PassVertex2.create = function() {
-	$s.push("sa.view.shader.PassVertex2::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 viewWorldMatrix;\n\n\tvarying vec2 textureCoord;\n\tvarying vec4 vertex;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = projectionMatrix * viewWorldMatrix * vec4(vertexPosition, 0.0, 1.0);\n\t\tvertex = vec4(vertexPosition, 0.0, 1.0);\n\t\ttextureCoord = (vertexPosition.xy + 1.0) * 0.5;\n\t}\n\n";
-	}
-	$s.pop();
-}
 sa.view.shader.PassVertex2.prototype.__class__ = sa.view.shader.PassVertex2;
 if(typeof bpmjs=='undefined') bpmjs = {}
 bpmjs.TaskError = function(p) { if( p === $_ ) return; {
@@ -2177,15 +2138,6 @@ IntHash.prototype.toString = function() {
 IntHash.prototype.__class__ = IntHash;
 sa.view.shader.UniformColor = function() { }
 sa.view.shader.UniformColor.__name__ = ["sa","view","shader","UniformColor"];
-sa.view.shader.UniformColor.create = function() {
-	$s.push("sa.view.shader.UniformColor::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tgl_FragColor = color;\n\t}\n\n";
-	}
-	$s.pop();
-}
 sa.view.shader.UniformColor.prototype.__class__ = sa.view.shader.UniformColor;
 GLFrame = function(p) { if( p === $_ ) return; {
 	$s.push("GLFrame::new");
@@ -2236,15 +2188,6 @@ sa.Main.main = function() {
 sa.Main.prototype.__class__ = sa.Main;
 sa.view.shader.PassVertex = function() { }
 sa.view.shader.PassVertex.__name__ = ["sa","view","shader","PassVertex"];
-sa.view.shader.PassVertex.create = function() {
-	$s.push("sa.view.shader.PassVertex::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 perspectiveMatrix;\n\n\tvarying vec2 textureCoord;\n\tvarying vec4 vertex;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = perspectiveMatrix * vec4(vertexPosition, 0.0, 1.0);\n\t\tvertex = vec4(vertexPosition, 0.0, 1.0);\n\t\ttextureCoord = (vertexPosition.xy + 1.0) * 0.5;\n\t}\n\n";
-	}
-	$s.pop();
-}
 sa.view.shader.PassVertex.prototype.__class__ = sa.view.shader.PassVertex;
 GLCursorClient = function(p) { if( p === $_ ) return; {
 	$s.push("GLCursorClient::new");
@@ -3070,15 +3013,6 @@ hsl.haxe._DirectSignaler.PropagationStatus.__name__ = ["hsl","haxe","_DirectSign
 hsl.haxe._DirectSignaler.PropagationStatus.prototype.__class__ = hsl.haxe._DirectSignaler.PropagationStatus;
 sa.view.shader.HitareaVertex = function() { }
 sa.view.shader.HitareaVertex.__name__ = ["sa","view","shader","HitareaVertex"];
-sa.view.shader.HitareaVertex.create = function() {
-	$s.push("sa.view.shader.HitareaVertex::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 viewWorldMatrix;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = projectionMatrix * viewWorldMatrix * vec4(vertexPosition, 0.0, 1.0);\n\t}\n\n";
-	}
-	$s.pop();
-}
 sa.view.shader.HitareaVertex.prototype.__class__ = sa.view.shader.HitareaVertex;
 hsl.haxe.Signal = function(data,currentBond,currentTarget,origin) { if( data === $_ ) return; {
 	$s.push("hsl.haxe.Signal::new");
@@ -3228,7 +3162,7 @@ sa.view.TextureRenderer.prototype.init = function(gl) {
 	$s.push("sa.view.TextureRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex.create(),sa.view.shader.Texture.create());
+	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex,sa.view.shader.Texture);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = GLUtil.createInt8VertexBuffer(gl,[-1,-1,1,-1,-1,1,1,-1,-1,1,1,1]);
@@ -3257,27 +3191,9 @@ sa.view.TextureRenderer.prototype.render = function(width,height) {
 sa.view.TextureRenderer.prototype.__class__ = sa.view.TextureRenderer;
 sa.view.shader.PlanktonVertex = function() { }
 sa.view.shader.PlanktonVertex.__name__ = ["sa","view","shader","PlanktonVertex"];
-sa.view.shader.PlanktonVertex.create = function() {
-	$s.push("sa.view.shader.PlanktonVertex::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\tattribute vec3 vertexPosition;\n\n\tuniform float elapsedTime;\n\tuniform float elapsedClickTime;\n\tuniform float peak;\n\tuniform float peakIncrement;\n\n\tuniform vec3 specularColor;\n\tuniform vec3 clickPos;\n\tuniform vec3 attractorPosition;\n\n\tuniform mat4 perspectiveMatrix;\n\tuniform mat4 objectMatrix;\n\tuniform mat4 rotationMatrix;\n\tuniform mat4 cameraMatrix;\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tvec4 worldPosition = objectMatrix * vec4(vertexPosition, 1.0);\n\t\tgl_PointSize = 1.0;\n\n\t\tfloat radiusSquared = pow(2.0, 2.0);\n\t\tvec3 spherePosition = attractorPosition;\n\t\tvec3 rayDir = normalize((cameraMatrix * vec4(0.0, 0.0, 10.0, 1.0)).xyz - worldPosition.xyz);\n\t\tvec3 sphereIntersectionToCenter = spherePosition - worldPosition.xyz;\n\n\t\tfloat sphereClosestApproach = dot(sphereIntersectionToCenter, rayDir);\n\n\t\tfloat value = 1.0;\n\t\tif (sphereClosestApproach > 0.0)\n\t\t{\n\t\t\tfloat l = length(sphereIntersectionToCenter);\n\t\t\tfloat sphereHalfCord2 = (radiusSquared - (l * l)) + (sphereClosestApproach * sphereClosestApproach);\n\n\t\t\tif (sphereHalfCord2 >= 0.0)\n\t\t\t{\n\t\t\t\tfloat dist = sphereClosestApproach - 1.0 / sphereHalfCord2;\n\t\t\t\tvalue = 0.4;\n\t\t\t\tworldPosition.z *= 1.0 + dist / 20.0;\n\t\t\t}\n\t\t}\n\t\t//value = clamp(value, 0.0, 1.0);\n\n\t\tfloat diffuse;\n\t\tfloat side;\n\t\tvec3 normal;\n\t\tif (vertexPosition.z == 0.0)\n\t\t{\n\t\t\tside = 0.0;\n\t\t\tdiffuse = 0.1;\n\t\t\tnormal = vec3(0.0, 1.0, 0.0);\n\t\t}\n\t\telse\n\t\t{\n\t\t\tside = 0.3;\n\t\t\tdiffuse = 1.0;\n\t\t\tnormal = vec3(0.0, -1.0, 0.0);\n\t\t}\n\n\t\tvalue += (worldPosition.z + 20.0) * 0.017;\n\t\tvalue = clamp(value, 0.0, 1.0);\n\n\t\tvec3 normalRot = normalize((rotationMatrix * vec4(normal, 1.0)).xyz);\n\t\tvec3 lightDir = normalize(attractorPosition.xyz - worldPosition.xyz);\n\n\t\tdiffuse = clamp(dot(normalRot, lightDir) * 1.0, 0.1, 1.0);\n\n\t\tfloat sinValue = clamp((sin(worldPosition.z * worldPosition.x * 0.03 + elapsedTime * 0.001 + peakIncrement) + 1.0) * 0.3, 0.0, 1.0);\n\t\tvec3 colorBase = vec3(111.0 / 255.0, 78.0 / 255.0, 129.0 / 255.0);\n\t\tvec3 colorSound = vec3(107.0 / 255.0, 186.0 / 255.0, 183.0 / 255.0);\n\t\tgl_Position = perspectiveMatrix * worldPosition;\n\t\tcolor = vec4(\n\t\t\tcolorBase * value * 0.2 * (0.5 + peak) +\n\t\t\tcolorSound * sinValue * 0.2 * value * (0.5 + peak)\n\t\t\t, 1.0);\n\t}\n";
-	}
-	$s.pop();
-}
 sa.view.shader.PlanktonVertex.prototype.__class__ = sa.view.shader.PlanktonVertex;
 sa.view.shader.Texture = function() { }
 sa.view.shader.Texture.__name__ = ["sa","view","shader","Texture"];
-sa.view.shader.Texture.create = function() {
-	$s.push("sa.view.shader.Texture::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform sampler2D texture;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tvec4 color = texture2D(texture, textureCoord);\n\t\tgl_FragColor = color;\n\t}\n\n";
-	}
-	$s.pop();
-}
 sa.view.shader.Texture.prototype.__class__ = sa.view.shader.Texture;
 sa.view.BackgroundRenderer = function(p) { if( p === $_ ) return; {
 	$s.push("sa.view.BackgroundRenderer::new");
@@ -3300,7 +3216,7 @@ sa.view.BackgroundRenderer.prototype.init = function(gl) {
 	$s.push("sa.view.BackgroundRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex2.create(),sa.view.shader.Texture.create());
+	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex2,sa.view.shader.Texture);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = GLUtil.createInt8VertexBuffer(gl,[1,-1,-1,1,-1,-1,1,-1,1,1,-1,1]);
@@ -4373,15 +4289,6 @@ GLAnimationFrame.run = function(method,ms) {
 GLAnimationFrame.prototype.__class__ = GLAnimationFrame;
 sa.view.shader.Color = function() { }
 sa.view.shader.Color.__name__ = ["sa","view","shader","Color"];
-sa.view.shader.Color.create = function() {
-	$s.push("sa.view.shader.Color::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tgl_FragColor = color;\n\t}\n\n";
-	}
-	$s.pop();
-}
 sa.view.shader.Color.prototype.__class__ = sa.view.shader.Color;
 bpmjs.Event = function(type) { if( type === $_ ) return; {
 	$s.push("bpmjs.Event::new");
@@ -5070,15 +4977,6 @@ bpmjs.TaskGroup.prototype.handleTaskComplete = function(task) {
 bpmjs.TaskGroup.prototype.__class__ = bpmjs.TaskGroup;
 sa.view.shader.StrangeAttractorVertex = function() { }
 sa.view.shader.StrangeAttractorVertex.__name__ = ["sa","view","shader","StrangeAttractorVertex"];
-sa.view.shader.StrangeAttractorVertex.create = function() {
-	$s.push("sa.view.shader.StrangeAttractorVertex::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\tattribute vec3 vertexPosition;\n\tattribute vec3 icolor;\n\n\tuniform float elapsedTime;\n\tuniform float elapsedClickTime;\n\tuniform float peak;\n\n\tuniform vec3 specularColor1;\n\tuniform vec3 specularColor2;\n\tuniform vec3 clickColor;\n\tuniform vec3 clickPos;\n\n\tuniform mat4 perspectiveMatrix;\n\tuniform mat4 objectMatrix;\n\tuniform mat4 cameraMatrix;\n\tuniform mat4 shadowMatrix;\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tfloat v = 0.0;\n\t\tfloat maxTime = 1300.0;\n\t\tif (elapsedClickTime > 0.0 && elapsedClickTime < maxTime)\n\t\t{\n\t\t\tvec3 distanceToClick = clickPos - vertexPosition;\n\t\t\tfloat radWidth = 0.5;\n\t\t\tfloat radMaxSize = 10.0;\n\t\t\tfloat radius = elapsedClickTime / maxTime * radMaxSize;\n\t\t\tfloat dist1 = (radius - radWidth - length(distanceToClick)) * 0.1;\n\t\t\tfloat dist2 = (radius - length(distanceToClick)) * 0.1;\n\t\t\tv = clamp(dist2 - dist2 / dist1, 0.0, 1.0);\n\t\t}\n\n\t\tfloat v2 = clamp(pow(1.0 + peak, 2.0) * 3.0 - 4.0, 0.0, 4.0);\n\t\tvec4 vertexPositionWobble = vec4(vertexPosition, 1.0);\n\t\tvertexPositionWobble.x += sin(vertexPositionWobble.y * 2.0 + 1.0) * sin(vertexPositionWobble.y * 1.0 + elapsedTime * 0.01) * 0.02 * v2;\n\t\tvertexPositionWobble.y += sin(vertexPositionWobble.x * 1.0 + 2.0) * sin(vertexPositionWobble.x * 2.0 + elapsedTime * 0.005) * 0.04 * v2;\n\t\tvertexPositionWobble.z += sin(vertexPositionWobble.y * 1.0 + 3.0) * sin(vertexPositionWobble.y * 3.0 + elapsedTime * 0.01) * 0.04 * v2;\n\n\t\tvec4 positionRot = objectMatrix * vertexPositionWobble;\n\n\t\tgl_Position = perspectiveMatrix * positionRot;\n\t\tgl_PointSize = clamp(3.0 - gl_Position.z / 7.0, 0.1, 1.5);\n\n\t\tvec3 normalRot = normalize(positionRot.xyz - (objectMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz);\n\t\tvec3 lightDir = normalize((cameraMatrix * vec4(10.0, 10.0, 0.0, 1.0)).xyz - positionRot.xyz);\n\n\t\tfloat diffuse = dot(normalRot, lightDir) * 0.5;\n\n\t\tvec3 viewDir = normalize((cameraMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz - positionRot.xyz);\n\n\t\tvec3 h1 = normalize(lightDir + viewDir);\n\t\tfloat specular1 = pow(dot(normalRot, h1), 60.0);\n\t\tif (!(specular1 < 0.0 || specular1 > 0.0))\n\t\t\tspecular1 = 0.0;\n\n\t\tvec3 h2 = normalize(-lightDir + viewDir);\n\t\tfloat specular2 = pow(dot(normalRot, h2), 40.0);\n\t\tif (!(specular2 < 0.0 || specular2 > 0.0))\n\t\t\tspecular2 = 0.0;\n\n\t\tvec3 h3 = normalize(-lightDir + vertexPositionWobble.xyz);\n\t\tfloat specular3 = pow(dot(normalRot, h3), 30.0);\n\t\tif (!(specular3 < 0.0 || specular3 > 0.0))\n\t\t\tspecular3 = 0.0;\n\n\t\tvec4 shadowPosition = shadowMatrix * positionRot;\n\t\tfloat shadow = (sin(shadowPosition.x * 1.0 + elapsedTime * 0.001 + sin(shadowPosition.y * 1.0 + elapsedTime * 0.002))) * 0.2 + 1.0;\n\t\tfloat shadow2 = sin(cos(shadowPosition.z) * sin(shadowPosition.y * 5.0 + elapsedTime * 0.0015) + shadowPosition.z * 10.0 + 3.0 + elapsedTime * 0.006) * sin((shadowMatrix * positionRot).z * 3.0 + 3.0 + elapsedTime * 0.002) * 0.2 + 1.0;\n\n\t\tcolor = vec4(\n\t\t\ticolor * 0.1 * shadow * shadow2 +\n\t\t\ticolor * clamp(diffuse, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tspecularColor1 * clamp(specular1 * 0.4, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tspecularColor2 * clamp(specular2 * 0.8, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tspecularColor1 * clamp(specular3 * 0.4, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tclickColor * v * 0.5\n\t\t\t, clamp(diffuse * 2.0, 0.5, 1.0));\n\t}\n";
-	}
-	$s.pop();
-}
 sa.view.shader.StrangeAttractorVertex.prototype.__class__ = sa.view.shader.StrangeAttractorVertex;
 Reflect = function() { }
 Reflect.__name__ = ["Reflect"];
@@ -5364,7 +5262,7 @@ sa.view.PlanktonRenderer.prototype.init = function(gl) {
 	$s.push("sa.view.PlanktonRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PlanktonVertex.create(),sa.view.shader.Color.create());
+	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PlanktonVertex,sa.view.shader.Color);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.perspectiveMatrixUniform = GLUtil.getUniformLocation(gl,this.shaderProgram,"perspectiveMatrix");
@@ -6191,16 +6089,16 @@ GLUtil.initGL = function(canvas,antialias) {
 	}
 	$s.pop();
 }
-GLUtil.createProgram = function(gl,vertexSource,fragmentSource) {
+GLUtil.createProgram = function(gl,vertexSourceClass,fragmentSourceClass) {
 	$s.push("GLUtil::createProgram");
 	var $spos = $s.length;
 	var shaderProgram = gl.createProgram();
 	var vs = gl.createShader(gl.VERTEX_SHADER);
-	gl.shaderSource(vs,vertexSource);
+	gl.shaderSource(vs,GLUtil.createGLSLFromClass(vertexSourceClass));
 	gl.compileShader(vs);
 	if(!gl.getShaderParameter(vs,gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(vs);
 	var fs = gl.createShader(gl.FRAGMENT_SHADER);
-	gl.shaderSource(fs,fragmentSource);
+	gl.shaderSource(fs,GLUtil.createGLSLFromClass(fragmentSourceClass));
 	gl.compileShader(fs);
 	if(!gl.getShaderParameter(fs,gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(fs);
 	gl.attachShader(shaderProgram,vs);
@@ -6210,6 +6108,19 @@ GLUtil.createProgram = function(gl,vertexSource,fragmentSource) {
 	{
 		$s.pop();
 		return shaderProgram;
+	}
+	$s.pop();
+}
+GLUtil.createGLSLFromClass = function(shaderClass) {
+	$s.push("GLUtil::createGLSLFromClass");
+	var $spos = $s.length;
+	var metaDatas = haxe.rtti.Meta.getType(shaderClass);
+	var glsl = Reflect.field(metaDatas,"GLSL");
+	if(glsl.length != 1) throw "Missing GLSL metadata in shader class: " + shaderClass;
+	{
+		var $tmp = glsl[0];
+		$s.pop();
+		return $tmp;
 	}
 	$s.pop();
 }
@@ -6229,7 +6140,7 @@ GLUtil.getUniformLocation = function(gl,shaderProgram,name) {
 	$s.push("GLUtil::getUniformLocation");
 	var $spos = $s.length;
 	var result = gl.getUniformLocation(shaderProgram,name);
-	if(result == null) haxe.Log.trace("Could not find " + name + " in shader",{ fileName : "GLUtil.hx", lineNumber : 51, className : "GLUtil", methodName : "getUniformLocation"});
+	if(result == null) haxe.Log.trace("Could not find " + name + " in shader",{ fileName : "GLUtil.hx", lineNumber : 62, className : "GLUtil", methodName : "getUniformLocation"});
 	{
 		$s.pop();
 		return result;
@@ -6240,7 +6151,7 @@ GLUtil.loadFonts = function(fonts,complete) {
 	$s.push("GLUtil::loadFonts");
 	var $spos = $s.length;
 	WebFontConfig = { google : { families : fonts}, active : function() {
-		$s.push("GLUtil::loadFonts@61");
+		$s.push("GLUtil::loadFonts@72");
 		var $spos = $s.length;
 		complete();
 		$s.pop();
@@ -6325,7 +6236,7 @@ sa.view.StrangeAttractorRenderer.prototype.init = function(gl) {
 	$s.push("sa.view.StrangeAttractorRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.StrangeAttractorVertex.create(),sa.view.shader.Color.create());
+	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.StrangeAttractorVertex,sa.view.shader.Color);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	this.colorAttribute = gl.getAttribLocation(this.shaderProgram,"icolor");
 	this.perspectiveMatrixUniform = GLUtil.getUniformLocation(gl,this.shaderProgram,"perspectiveMatrix");
@@ -6768,7 +6679,7 @@ sa.view.RocksRenderer.prototype.init = function(gl) {
 	$s.push("sa.view.RocksRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex2.create(),sa.view.shader.Texture.create());
+	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex2,sa.view.shader.Texture);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = GLUtil.createInt8VertexBuffer(gl,[1,-1,-1,1,-1,-1,1,-1,1,1,-1,1]);
@@ -6942,15 +6853,6 @@ sa.view.TextureId.FLIGHTER.toString = $estr;
 sa.view.TextureId.FLIGHTER.__enum__ = sa.view.TextureId;
 sa.view.shader.UnderWater = function() { }
 sa.view.shader.UnderWater.__name__ = ["sa","view","shader","UnderWater"];
-sa.view.shader.UnderWater.create = function() {
-	$s.push("sa.view.shader.UnderWater::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\t#define NUM_RAYS 20\n\n\tuniform float elapsedTime;\n\n\tvarying vec2 textureCoord;\n\tvarying vec4 vertex;\n\n\tvoid main(void)\n\t{\n\t\tfloat value = 0.0;\n\t\tfloat num = float(NUM_RAYS);\n\n\t\tfloat sinT1 = sin(elapsedTime * 0.002) * 0.2;\n\t\tfloat sinT2 = sin(2.0 + elapsedTime * 0.0013) * 0.3;\n\n\t\tfor(int i = 0; i < NUM_RAYS; i++)\n\t\t{\n\t\t\tfloat fi = float(i + 2) / num;\n\t\t\tfloat rad = float(i) * 0.2 + (1.0 + elapsedTime * 0.001) * 0.3;\n\n\t\t\tvec2 light = vec2(sin(fi * 13.3 + elapsedTime * 0.0002 + sin(fi * 13.3 + elapsedTime * 0.0005)) * 0.1 + 0.8, cos(fi * 18.0 + elapsedTime * 0.0001) * 0.1 + 1.2);\n\t\t\tvec2 lightDir = normalize(vec2(sin(fi * 0.9 * (1.0 + 0.9 * sin(elapsedTime * 0.0001 + 2.0)) + sin(elapsedTime * 0.00005 + 3.0) * 0.1 + 0.3) , cos(0.3 + fi * 0.8 + sin(1.0 + elapsedTime * 0.0003) * 0.1)));\n\n\t\t\tfloat lightAngle = dot(lightDir, normalize(light - vertex.xy));\n\t\t\tif (lightAngle > 0.0)\n\t\t\t{\n\t\t\t\tfloat dist = distance(light, vertex.xy);\n\t\t\t\tfloat xd1 = sin(fi * 30.0 + sinT1 + sinT2);\n\t\t\t\tfloat xd2 = sin(fi * 10.0 + sinT1 + sinT2 + 3.0);\n\t\t\t\tfloat radius = (xd1 + 1.0) * 600.0 + 100.0;\n\t\t\t\tvalue += clamp(pow(lightAngle, radius * dist * dist) * (0.4 + xd1 * 0.3) / pow(1.0 + dist, 9.5 + xd2 * 8.0), 0.0, 1.0);\n\t\t\t}\n\t\t}\n\n\t\tvec3 color = vec3(195.0 / 255.0, 164.0 / 255.0, 246.0 / 255.0);\n\t\tvalue = clamp(value * 0.4, 0.0, 0.8);\n\t\tgl_FragColor = vec4(color, 1.0) * vec4(value, value, value, 1.0);\n\t}\n\n";
-	}
-	$s.pop();
-}
 sa.view.shader.UnderWater.prototype.__class__ = sa.view.shader.UnderWater;
 Std = function() { }
 Std.__name__ = ["Std"];
@@ -7753,15 +7655,6 @@ haxe.rtti.Meta.prototype.__class__ = haxe.rtti.Meta;
 if(typeof shader=='undefined') shader = {}
 shader.DisplayObjectVertex = function() { }
 shader.DisplayObjectVertex.__name__ = ["shader","DisplayObjectVertex"];
-shader.DisplayObjectVertex.create = function() {
-	$s.push("shader.DisplayObjectVertex::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 objectMatrix;\n\tuniform vec2 size;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = projectionMatrix * objectMatrix * (vec4(size, 1.0, 1.0) * vec4(vertexPosition, 0.0, 1.0));\n\t\ttextureCoord = vertexPosition.xy;\n\t}\n\n";
-	}
-	$s.pop();
-}
 shader.DisplayObjectVertex.prototype.__class__ = shader.DisplayObjectVertex;
 GLHitareaPicker = function(p) { if( p === $_ ) return; {
 	$s.push("GLHitareaPicker::new");
@@ -7827,15 +7720,6 @@ GLHitareaPicker.prototype.pickDisplayObject = function(displayObject,parentMatri
 GLHitareaPicker.prototype.__class__ = GLHitareaPicker;
 shader.DisplayObjectFragment = function() { }
 shader.DisplayObjectFragment.__name__ = ["shader","DisplayObjectFragment"];
-shader.DisplayObjectFragment.create = function() {
-	$s.push("shader.DisplayObjectFragment::create");
-	var $spos = $s.length;
-	{
-		$s.pop();
-		return "\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform sampler2D texture;\n\tuniform float alpha;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tvec4 color = texture2D(texture, textureCoord);\n\t\tgl_FragColor = color * vec4(1.0, 1.0, 1.0, alpha);\n\t}\n\n";
-	}
-	$s.pop();
-}
 shader.DisplayObjectFragment.prototype.__class__ = shader.DisplayObjectFragment;
 haxe.exception.ArgumentNullException = function(argumentName,numberOfStackTraceShifts) { if( argumentName === $_ ) return; {
 	$s.push("haxe.exception.ArgumentNullException::new");
@@ -7964,14 +7848,14 @@ sa.view.CreditsRenderer.prototype.init = function(gl) {
 	$s.push("sa.view.CreditsRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex2.create(),sa.view.shader.Texture.create());
+	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex2,sa.view.shader.Texture);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = GLUtil.createInt8VertexBuffer(gl,[1,-1,-1,1,-1,-1,1,-1,1,1,-1,1]);
 	this.textureUniform = GLUtil.getUniformLocation(gl,this.shaderProgram,"texture");
 	this.projectionMatrixUniform = GLUtil.getUniformLocation(gl,this.shaderProgram,"projectionMatrix");
 	this.viewWorldMatrixUniform = GLUtil.getUniformLocation(gl,this.shaderProgram,"viewWorldMatrix");
-	this.shaderProgramButton = GLUtil.createProgram(gl,sa.view.shader.HitareaVertex.create(),sa.view.shader.UniformColor.create());
+	this.shaderProgramButton = GLUtil.createProgram(gl,sa.view.shader.HitareaVertex,sa.view.shader.UniformColor);
 	this.projectionMatrixButtonUniform = GLUtil.getUniformLocation(gl,this.shaderProgramButton,"projectionMatrix");
 	this.viewWorldMatrixButtonUniform = GLUtil.getUniformLocation(gl,this.shaderProgramButton,"viewWorldMatrix");
 	this.colorButtonUniform = GLUtil.getUniformLocation(gl,this.shaderProgramButton,"color");
@@ -8555,38 +8439,7 @@ sa.view.UnderWaterRenderer.prototype.init = function(gl) {
 	$s.push("sa.view.UnderWaterRenderer::init");
 	var $spos = $s.length;
 	this.gl = gl;
-	this.shaderProgram = gl.createProgram();
-	var vs = gl.createShader(gl.VERTEX_SHADER);
-	gl.shaderSource(vs,sa.view.shader.PassVertex.create());
-	gl.compileShader(vs);
-	if(!gl.getShaderParameter(vs,gl.COMPILE_STATUS)) {
-		haxe.Log.trace(gl.getShaderInfoLog(vs),{ fileName : "UnderWaterRenderer.hx", lineNumber : 31, className : "sa.view.UnderWaterRenderer", methodName : "init"});
-		{
-			$s.pop();
-			return;
-		}
-	}
-	var fs = gl.createShader(gl.FRAGMENT_SHADER);
-	gl.shaderSource(fs,sa.view.shader.UnderWater.create());
-	gl.compileShader(fs);
-	var status = gl.getShaderParameter(fs,gl.COMPILE_STATUS);
-	if(!status) {
-		haxe.Log.trace(gl.getShaderInfoLog(fs),{ fileName : "UnderWaterRenderer.hx", lineNumber : 40, className : "sa.view.UnderWaterRenderer", methodName : "init"});
-		{
-			$s.pop();
-			return;
-		}
-	}
-	gl.attachShader(this.shaderProgram,vs);
-	gl.attachShader(this.shaderProgram,fs);
-	gl.linkProgram(this.shaderProgram);
-	if(!gl.getProgramParameter(this.shaderProgram,gl.LINK_STATUS)) {
-		haxe.Log.trace("Could not initialise shaders",{ fileName : "UnderWaterRenderer.hx", lineNumber : 49, className : "sa.view.UnderWaterRenderer", methodName : "init"});
-		{
-			$s.pop();
-			return;
-		}
-	}
+	this.shaderProgram = GLUtil.createProgram(gl,sa.view.shader.PassVertex,sa.view.shader.UnderWater);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	gl.enableVertexAttribArray(this.vertexPositionAttribute);
 	this.vertexBuffer = gl.createBuffer();
@@ -9643,6 +9496,9 @@ js.Boot.__init();
 	Xml.Prolog = "prolog";
 	Xml.Document = "document";
 }
+sa.view.shader.PassVertex2.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 viewWorldMatrix;\n\n\tvarying vec2 textureCoord;\n\tvarying vec4 vertex;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = projectionMatrix * viewWorldMatrix * vec4(vertexPosition, 0.0, 1.0);\n\t\tvertex = vec4(vertexPosition, 0.0, 1.0);\n\t\ttextureCoord = (vertexPosition.xy + 1.0) * 0.5;\n\t}\n\n"]}};
+sa.view.shader.UniformColor.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tgl_FragColor = color;\n\t}\n\n"]}};
+sa.view.shader.PassVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 perspectiveMatrix;\n\n\tvarying vec2 textureCoord;\n\tvarying vec4 vertex;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = perspectiveMatrix * vec4(vertexPosition, 0.0, 1.0);\n\t\tvertex = vec4(vertexPosition, 0.0, 1.0);\n\t\ttextureCoord = (vertexPosition.xy + 1.0) * 0.5;\n\t}\n\n"]}};
 GLCursorClient.DEFAULT = "default";
 GLCursorClient.HAND = "pointer";
 sa.controller.Launcher.__meta__ = { obj : { ManagedEvents : ["launcherStart"]}, fields : { textureRegistry : { Inject : null}, imageRegistry : { Inject : null}, preloaderView : { Inject : null}, handlePostComplete : { PostComplete : null}}};
@@ -9650,17 +9506,25 @@ sa.controller.Launcher.__rtti = "<class path=\"sa.controller.Launcher\" params=\
 hsl.haxe._DirectSignaler.PropagationStatus.IMMEDIATELY_STOPPED = 1;
 hsl.haxe._DirectSignaler.PropagationStatus.STOPPED = 2;
 hsl.haxe._DirectSignaler.PropagationStatus.UNDISTURBED = 3;
+sa.view.shader.HitareaVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 viewWorldMatrix;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = projectionMatrix * viewWorldMatrix * vec4(vertexPosition, 0.0, 1.0);\n\t}\n\n"]}};
+sa.view.shader.PlanktonVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec3 vertexPosition;\n\n\tuniform float elapsedTime;\n\tuniform float elapsedClickTime;\n\tuniform float peak;\n\tuniform float peakIncrement;\n\n\tuniform vec3 specularColor;\n\tuniform vec3 clickPos;\n\tuniform vec3 attractorPosition;\n\n\tuniform mat4 perspectiveMatrix;\n\tuniform mat4 objectMatrix;\n\tuniform mat4 rotationMatrix;\n\tuniform mat4 cameraMatrix;\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tvec4 worldPosition = objectMatrix * vec4(vertexPosition, 1.0);\n\t\tgl_PointSize = 1.0;\n\n\t\tfloat radiusSquared = pow(2.0, 2.0);\n\t\tvec3 spherePosition = attractorPosition;\n\t\tvec3 rayDir = normalize((cameraMatrix * vec4(0.0, 0.0, 10.0, 1.0)).xyz - worldPosition.xyz);\n\t\tvec3 sphereIntersectionToCenter = spherePosition - worldPosition.xyz;\n\n\t\tfloat sphereClosestApproach = dot(sphereIntersectionToCenter, rayDir);\n\n\t\tfloat value = 1.0;\n\t\tif (sphereClosestApproach > 0.0)\n\t\t{\n\t\t\tfloat l = length(sphereIntersectionToCenter);\n\t\t\tfloat sphereHalfCord2 = (radiusSquared - (l * l)) + (sphereClosestApproach * sphereClosestApproach);\n\n\t\t\tif (sphereHalfCord2 >= 0.0)\n\t\t\t{\n\t\t\t\tfloat dist = sphereClosestApproach - 1.0 / sphereHalfCord2;\n\t\t\t\tvalue = 0.4;\n\t\t\t\tworldPosition.z *= 1.0 + dist / 20.0;\n\t\t\t}\n\t\t}\n\t\t//value = clamp(value, 0.0, 1.0);\n\n\t\tfloat diffuse;\n\t\tfloat side;\n\t\tvec3 normal;\n\t\tif (vertexPosition.z == 0.0)\n\t\t{\n\t\t\tside = 0.0;\n\t\t\tdiffuse = 0.1;\n\t\t\tnormal = vec3(0.0, 1.0, 0.0);\n\t\t}\n\t\telse\n\t\t{\n\t\t\tside = 0.3;\n\t\t\tdiffuse = 1.0;\n\t\t\tnormal = vec3(0.0, -1.0, 0.0);\n\t\t}\n\n\t\tvalue += (worldPosition.z + 20.0) * 0.017;\n\t\tvalue = clamp(value, 0.0, 1.0);\n\n\t\tvec3 normalRot = normalize((rotationMatrix * vec4(normal, 1.0)).xyz);\n\t\tvec3 lightDir = normalize(attractorPosition.xyz - worldPosition.xyz);\n\n\t\tdiffuse = clamp(dot(normalRot, lightDir) * 1.0, 0.1, 1.0);\n\n\t\tfloat sinValue = clamp((sin(worldPosition.z * worldPosition.x * 0.03 + elapsedTime * 0.001 + peakIncrement) + 1.0) * 0.3, 0.0, 1.0);\n\t\tvec3 colorBase = vec3(111.0 / 255.0, 78.0 / 255.0, 129.0 / 255.0);\n\t\tvec3 colorSound = vec3(107.0 / 255.0, 186.0 / 255.0, 183.0 / 255.0);\n\t\tgl_Position = perspectiveMatrix * worldPosition;\n\t\tcolor = vec4(\n\t\t\tcolorBase * value * 0.2 * (0.5 + peak) +\n\t\t\tcolorSound * sinValue * 0.2 * value * (0.5 + peak)\n\t\t\t, 1.0);\n\t}\n\n"]}};
+sa.view.shader.Texture.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform sampler2D texture;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tvec4 color = texture2D(texture, textureCoord);\n\t\tgl_FragColor = color;\n\t}\n\n"]}};
+sa.view.shader.Color.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tgl_FragColor = color;\n\t}\n\n"]}};
 bpmjs.Event.COMPLETE = "complete";
 bpmjs.Event.START = "start";
 sa.controller.AudioController.__meta__ = { fields : { commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}}};
 sa.controller.AudioController.__rtti = "<class path=\"sa.controller.AudioController\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel public=\"1\"><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<audio><c path=\"Audio\"/></audio>\n\t<peaks><c path=\"Array\"><c path=\"Float\"/></c></peaks>\n\t<handleLauncherStart public=\"1\" set=\"method\" line=\"30\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleTimer set=\"method\" line=\"39\"><f a=\"\"><e path=\"Void\"/></f></handleTimer>\n\t<new public=\"1\" set=\"method\" line=\"18\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 js.Lib.onerror = null;
+sa.view.shader.StrangeAttractorVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec3 vertexPosition;\n\tattribute vec3 icolor;\n\n\tuniform float elapsedTime;\n\tuniform float elapsedClickTime;\n\tuniform float peak;\n\n\tuniform vec3 specularColor1;\n\tuniform vec3 specularColor2;\n\tuniform vec3 clickColor;\n\tuniform vec3 clickPos;\n\n\tuniform mat4 perspectiveMatrix;\n\tuniform mat4 objectMatrix;\n\tuniform mat4 cameraMatrix;\n\tuniform mat4 shadowMatrix;\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tfloat v = 0.0;\n\t\tfloat maxTime = 1300.0;\n\t\tif (elapsedClickTime > 0.0 && elapsedClickTime < maxTime)\n\t\t{\n\t\t\tvec3 distanceToClick = clickPos - vertexPosition;\n\t\t\tfloat radWidth = 0.5;\n\t\t\tfloat radMaxSize = 10.0;\n\t\t\tfloat radius = elapsedClickTime / maxTime * radMaxSize;\n\t\t\tfloat dist1 = (radius - radWidth - length(distanceToClick)) * 0.1;\n\t\t\tfloat dist2 = (radius - length(distanceToClick)) * 0.1;\n\t\t\tv = clamp(dist2 - dist2 / dist1, 0.0, 1.0);\n\t\t}\n\n\t\tfloat v2 = clamp(pow(1.0 + peak, 2.0) * 3.0 - 4.0, 0.0, 4.0);\n\t\tvec4 vertexPositionWobble = vec4(vertexPosition, 1.0);\n\t\tvertexPositionWobble.x += sin(vertexPositionWobble.y * 2.0 + 1.0) * sin(vertexPositionWobble.y * 1.0 + elapsedTime * 0.01) * 0.02 * v2;\n\t\tvertexPositionWobble.y += sin(vertexPositionWobble.x * 1.0 + 2.0) * sin(vertexPositionWobble.x * 2.0 + elapsedTime * 0.005) * 0.04 * v2;\n\t\tvertexPositionWobble.z += sin(vertexPositionWobble.y * 1.0 + 3.0) * sin(vertexPositionWobble.y * 3.0 + elapsedTime * 0.01) * 0.04 * v2;\n\n\t\tvec4 positionRot = objectMatrix * vertexPositionWobble;\n\n\t\tgl_Position = perspectiveMatrix * positionRot;\n\t\tgl_PointSize = clamp(3.0 - gl_Position.z / 7.0, 0.1, 1.5);\n\n\t\tvec3 normalRot = normalize(positionRot.xyz - (objectMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz);\n\t\tvec3 lightDir = normalize((cameraMatrix * vec4(10.0, 10.0, 0.0, 1.0)).xyz - positionRot.xyz);\n\n\t\tfloat diffuse = dot(normalRot, lightDir) * 0.5;\n\n\t\tvec3 viewDir = normalize((cameraMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz - positionRot.xyz);\n\n\t\tvec3 h1 = normalize(lightDir + viewDir);\n\t\tfloat specular1 = pow(dot(normalRot, h1), 60.0);\n\t\tif (!(specular1 < 0.0 || specular1 > 0.0))\n\t\t\tspecular1 = 0.0;\n\n\t\tvec3 h2 = normalize(-lightDir + viewDir);\n\t\tfloat specular2 = pow(dot(normalRot, h2), 40.0);\n\t\tif (!(specular2 < 0.0 || specular2 > 0.0))\n\t\t\tspecular2 = 0.0;\n\n\t\tvec3 h3 = normalize(-lightDir + vertexPositionWobble.xyz);\n\t\tfloat specular3 = pow(dot(normalRot, h3), 30.0);\n\t\tif (!(specular3 < 0.0 || specular3 > 0.0))\n\t\t\tspecular3 = 0.0;\n\n\t\tvec4 shadowPosition = shadowMatrix * positionRot;\n\t\tfloat shadow = (sin(shadowPosition.x * 1.0 + elapsedTime * 0.001 + sin(shadowPosition.y * 1.0 + elapsedTime * 0.002))) * 0.2 + 1.0;\n\t\tfloat shadow2 = sin(cos(shadowPosition.z) * sin(shadowPosition.y * 5.0 + elapsedTime * 0.0015) + shadowPosition.z * 10.0 + 3.0 + elapsedTime * 0.006) * sin((shadowMatrix * positionRot).z * 3.0 + 3.0 + elapsedTime * 0.002) * 0.2 + 1.0;\n\n\t\tcolor = vec4(\n\t\t\ticolor * 0.1 * shadow * shadow2 +\n\t\t\ticolor * clamp(diffuse, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tspecularColor1 * clamp(specular1 * 0.4, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tspecularColor2 * clamp(specular2 * 0.8, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tspecularColor1 * clamp(specular3 * 0.4, 0.0, 1.0) * shadow * shadow2 +\n\t\t\tclickColor * v * 0.5\n\t\t\t, clamp(diffuse * 2.0, 0.5, 1.0));\n\t}\n\n"]}};
 sa.Config.__rtti = "<class path=\"sa.Config\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel public=\"1\"><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry public=\"1\"><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<imageRegistry public=\"1\"><c path=\"GLImageRegistry\"/></imageRegistry>\n\t<stageResizeAction public=\"1\"><c path=\"sa.controller.StageResizeAction\"/></stageResizeAction>\n\t<launcher public=\"1\"><c path=\"sa.controller.Launcher\"/></launcher>\n\t<audioController public=\"1\"><c path=\"sa.controller.AudioController\"/></audioController>\n\t<cameraController public=\"1\"><c path=\"sa.controller.CameraController\"/></cameraController>\n\t<canvasView public=\"1\"><c path=\"sa.view.CanvasView\"/></canvasView>\n\t<preloaderView public=\"1\"><c path=\"sa.view.PreloaderView\"/></preloaderView>\n\t<mainInterfaceView public=\"1\"><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<controller set=\"method\" line=\"47\"><f a=\"\"><e path=\"Void\"/></f></controller>\n\t<model set=\"method\" line=\"55\"><f a=\"\"><e path=\"Void\"/></f></model>\n\t<view set=\"method\" line=\"76\"><f a=\"\"><e path=\"Void\"/></f></view>\n\t<new public=\"1\" set=\"method\" line=\"40\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
+sa.view.shader.UnderWater.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\t#define NUM_RAYS 20\n\n\tuniform float elapsedTime;\n\n\tvarying vec2 textureCoord;\n\tvarying vec4 vertex;\n\n\tvoid main(void)\n\t{\n\t\tfloat value = 0.0;\n\t\tfloat num = float(NUM_RAYS);\n\n\t\tfloat sinT1 = sin(elapsedTime * 0.002) * 0.2;\n\t\tfloat sinT2 = sin(2.0 + elapsedTime * 0.0013) * 0.3;\n\n\t\tfor(int i = 0; i < NUM_RAYS; i++)\n\t\t{\n\t\t\tfloat fi = float(i + 2) / num;\n\t\t\tfloat rad = float(i) * 0.2 + (1.0 + elapsedTime * 0.001) * 0.3;\n\n\t\t\tvec2 light = vec2(sin(fi * 13.3 + elapsedTime * 0.0002 + sin(fi * 13.3 + elapsedTime * 0.0005)) * 0.1 + 0.8, cos(fi * 18.0 + elapsedTime * 0.0001) * 0.1 + 1.2);\n\t\t\tvec2 lightDir = normalize(vec2(sin(fi * 0.9 * (1.0 + 0.9 * sin(elapsedTime * 0.0001 + 2.0)) + sin(elapsedTime * 0.00005 + 3.0) * 0.1 + 0.3) , cos(0.3 + fi * 0.8 + sin(1.0 + elapsedTime * 0.0003) * 0.1)));\n\n\t\t\tfloat lightAngle = dot(lightDir, normalize(light - vertex.xy));\n\t\t\tif (lightAngle > 0.0)\n\t\t\t{\n\t\t\t\tfloat dist = distance(light, vertex.xy);\n\t\t\t\tfloat xd1 = sin(fi * 30.0 + sinT1 + sinT2);\n\t\t\t\tfloat xd2 = sin(fi * 10.0 + sinT1 + sinT2 + 3.0);\n\t\t\t\tfloat radius = (xd1 + 1.0) * 600.0 + 100.0;\n\t\t\t\tvalue += clamp(pow(lightAngle, radius * dist * dist) * (0.4 + xd1 * 0.3) / pow(1.0 + dist, 9.5 + xd2 * 8.0), 0.0, 1.0);\n\t\t\t}\n\t\t}\n\n\t\tvec3 color = vec3(195.0 / 255.0, 164.0 / 255.0, 246.0 / 255.0);\n\t\tvalue = clamp(value * 0.4, 0.0, 0.8);\n\t\tgl_FragColor = vec4(color, 1.0) * vec4(value, value, value, 1.0);\n\t}\n\n"]}};
 sa.view.MainInterfaceView.__meta__ = { fields : { imageRegistry : { Inject : null}, commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}, handleStageResize : { MessageHandler : null}}};
 sa.view.MainInterfaceView.__rtti = "<class path=\"sa.view.MainInterfaceView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<imageRegistry><c path=\"GLImageRegistry\"/></imageRegistry>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<stage public=\"1\"><c path=\"GLStage\"/></stage>\n\t<blend><c path=\"GLDisplayObject\"/></blend>\n\t<startButton><c path=\"GLInteractiveObject\"/></startButton>\n\t<creditsButton><c path=\"GLInteractiveObject\"/></creditsButton>\n\t<modeButton><c path=\"GLInteractiveObject\"/></modeButton>\n\t<handleLauncherStart set=\"method\" line=\"37\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<start public=\"1\" set=\"method\" line=\"76\"><f a=\"\"><e path=\"Void\"/></f></start>\n\t<handleStartFadeInComplete set=\"method\" line=\"82\"><f a=\"tween\">\n\t<c path=\"GLTween\"/>\n\t<e path=\"Void\"/>\n</f></handleStartFadeInComplete>\n\t<handeClick set=\"method\" line=\"87\"><f a=\"?obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handeClick>\n\t<handleStartFadeOutComplete set=\"method\" line=\"101\"><f a=\"tween\">\n\t<c path=\"GLTween\"/>\n\t<e path=\"Void\"/>\n</f></handleStartFadeOutComplete>\n\t<handleCreditsButtonClick set=\"method\" line=\"112\"><f a=\"obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handleCreditsButtonClick>\n\t<handleModeButtonClick set=\"method\" line=\"117\"><f a=\"obj\">\n\t<c path=\"GLInteractiveObject\"/>\n\t<e path=\"Void\"/>\n</f></handleModeButtonClick>\n\t<handleStageResize set=\"method\" line=\"123\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<layoutElements set=\"method\" line=\"128\"><f a=\"\"><e path=\"Void\"/></f></layoutElements>\n\t<new public=\"1\" set=\"method\" line=\"31\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 sa.view.CanvasView.__meta__ = { fields : { commonModel : { Inject : null}, textureRegistry : { Inject : null}, mainInterfaceView : { Inject : null}, handleLauncherStart : { MessageHandler : null}, handleStageResize : { MessageHandler : null}}};
 sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<mainInterfaceView><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<gl><c path=\"WebGLRenderingContext\"/></gl>\n\t<canvas><c path=\"Canvas\"/></canvas>\n\t<framebuffer><c path=\"GLFramebuffer\"/></framebuffer>\n\t<backgroundRenderer><c path=\"sa.view.BackgroundRenderer\"/></backgroundRenderer>\n\t<underWaterRenderer><c path=\"sa.view.UnderWaterRenderer\"/></underWaterRenderer>\n\t<textureRenderer><c path=\"sa.view.TextureRenderer\"/></textureRenderer>\n\t<planktonRenderer><c path=\"sa.view.PlanktonRenderer\"/></planktonRenderer>\n\t<rocksRenderer><c path=\"sa.view.RocksRenderer\"/></rocksRenderer>\n\t<saRenderer><c path=\"sa.view.StrangeAttractorRenderer\"/></saRenderer>\n\t<displayListRenderer><c path=\"GLDisplayListRenderer\"/></displayListRenderer>\n\t<creditsRenderer><c path=\"sa.view.CreditsRenderer\"/></creditsRenderer>\n\t<handleLauncherStart set=\"method\" line=\"36\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleModeChanged set=\"method\" line=\"93\"><f a=\"newMode\">\n\t<c path=\"Int\"/>\n\t<e path=\"Void\"/>\n</f></handleModeChanged>\n\t<handleStageResize set=\"method\" line=\"99\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<updateCanvas set=\"method\" line=\"104\"><f a=\"\"><e path=\"Void\"/></f></updateCanvas>\n\t<tick set=\"method\" line=\"110\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<renderScene set=\"method\" line=\"127\"><f a=\"\"><e path=\"Void\"/></f></renderScene>\n\t<renderInterface set=\"method\" line=\"158\"><f a=\"\"><e path=\"Void\"/></f></renderInterface>\n\t<new public=\"1\" set=\"method\" line=\"33\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 haxe.Timer.arr = new Array();
+shader.DisplayObjectVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec2 vertexPosition;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 objectMatrix;\n\tuniform vec2 size;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tgl_Position = projectionMatrix * objectMatrix * (vec4(size, 1.0, 1.0) * vec4(vertexPosition, 0.0, 1.0));\n\t\ttextureCoord = vertexPosition.xy;\n\t}\n\n"]}};
+shader.DisplayObjectFragment.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform sampler2D texture;\n\tuniform float alpha;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tvec4 color = texture2D(texture, textureCoord);\n\t\tgl_FragColor = color * vec4(1.0, 1.0, 1.0, alpha);\n\t}\n\n"]}};
 sa.controller.CameraController.__meta__ = { fields : { commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}}};
 sa.controller.CameraController.__rtti = "<class path=\"sa.controller.CameraController\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<cameraPosition><c path=\"MoveSetVec2\"/></cameraPosition>\n\t<lastTick><c path=\"Float\"/></lastTick>\n\t<handleLauncherStart set=\"method\" line=\"24\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<tick set=\"method\" line=\"30\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<handleMouseMove set=\"method\" line=\"40\"><f a=\"mousePos\">\n\t<c path=\"Vec2\"/>\n\t<e path=\"Void\"/>\n</f></handleMouseMove>\n\t<new public=\"1\" set=\"method\" line=\"18\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 bpmjs.Stats.fps = 0;

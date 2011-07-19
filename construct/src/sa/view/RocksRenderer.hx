@@ -46,7 +46,7 @@ class RocksRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2.create(), sa.view.shader.Texture.create());
+		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2, sa.view.shader.Texture);
 
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);

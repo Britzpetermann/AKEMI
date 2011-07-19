@@ -62,7 +62,7 @@ class CreditsRenderer
 	{
 		this.gl = gl;
 
-		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2.create(), sa.view.shader.Texture.create());
+		shaderProgram = GLUtil.createProgram(gl, sa.view.shader.PassVertex2, sa.view.shader.Texture);
 		vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "vertexPosition");
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 		vertexBuffer = GLUtil.createInt8VertexBuffer(gl, [
@@ -78,7 +78,7 @@ class CreditsRenderer
 		viewWorldMatrixUniform = GLUtil.getUniformLocation(gl, shaderProgram, "viewWorldMatrix");
 
 		#if debug
-			shaderProgramButton = GLUtil.createProgram(gl, sa.view.shader.HitareaVertex.create(), sa.view.shader.UniformColor.create());
+			shaderProgramButton = GLUtil.createProgram(gl, sa.view.shader.HitareaVertex, sa.view.shader.UniformColor);
 			projectionMatrixButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "projectionMatrix");
 			viewWorldMatrixButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "viewWorldMatrix");
 			colorButtonUniform = GLUtil.getUniformLocation(gl, shaderProgramButton, "color");
