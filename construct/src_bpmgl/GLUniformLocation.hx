@@ -101,6 +101,11 @@ class GLUniformLocation
 		GL.gl.uniformMatrix4fv(location, transpose, value);
 	}
 
+	public inline function setMatrix3(matrix : Matrix3) : Void
+	{
+		GL.gl.uniformMatrix3fv(location, false, matrix.buffer);
+	}
+
 	public inline function setMatrix4(matrix : Matrix4) : Void
 	{
 		GL.gl.uniformMatrix4fv(location, false, matrix.buffer);

@@ -28,39 +28,18 @@ class Launcher extends EventDispatcher, implements Infos
 	@PostComplete
 	public function handlePostComplete()
 	{
-		preloaderView.start("Fonts");
-
-		//GL.loadFonts([""], fontsLoaded);
-		fontsLoaded();
-	}
-
-	function fontsLoaded()
-	{
-		preloaderView.complete();
-
 		var gl = textureRegistry.gl;
 
 		var group = new TaskGroup();
-		group.add(createTextureTask("image/Stripe1.png", TextureId.STRIPE1, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/Flighter.png", TextureId.FLIGHTER, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/Stripe2.png", TextureId.STRIPE2, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/Stones.png", TextureId.STONES_RIGHT, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/Stones2.png", TextureId.STONES_LEFT, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/RockLeft2.png", TextureId.ROCK_LEFT, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/RockRight3.png", TextureId.ROCK_RIGHT, textureRegistry.gl.LINEAR));
-		group.add(createTextureTask("image/BG3.jpg", TextureId.BACKGROUND, textureRegistry.gl.NEAREST));
-		group.add(createTextureTask("image/Credits2.png", TextureId.CREDITS, textureRegistry.gl.LINEAR));
-		group.add(createImageTask("image/SplashWithText.jpg", ImageId.SPLASH));
-		group.add(createImageTask("image/CreditsBt.png", ImageId.CREDITS_BTN));
-		group.add(createImageTask("image/ModeBt.png", ImageId.MODE_BTN));
 		group.completeSignaler.bind(handleComplete);
 
-		preloaderView.max = group.tasks.length + 1;
+		preloaderView.max = group.tasks.length;
 		group.start();
 	}
 
 	function handleComplete(task : TaskGroup)
 	{
+		preloaderView.complete();
 		try
 		{
 			dispatchEvent(new LauncherStart());
