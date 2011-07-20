@@ -935,7 +935,6 @@ GLDisplayListRenderer = function(p) { if( p === $_ ) return; {
 	$s.pop();
 }}
 GLDisplayListRenderer.__name__ = ["GLDisplayListRenderer"];
-GLDisplayListRenderer.prototype.gl = null;
 GLDisplayListRenderer.prototype.shaderProgram = null;
 GLDisplayListRenderer.prototype.vertexPositionAttribute = null;
 GLDisplayListRenderer.prototype.vertexBuffer = null;
@@ -945,10 +944,10 @@ GLDisplayListRenderer.prototype.objectMatrixUniform = null;
 GLDisplayListRenderer.prototype.sizeUniform = null;
 GLDisplayListRenderer.prototype.alphaUniform = null;
 GLDisplayListRenderer.prototype.textures = null;
-GLDisplayListRenderer.prototype.init = function(gl) {
+GLDisplayListRenderer.prototype.init = function() {
 	$s.push("GLDisplayListRenderer::init");
 	var $spos = $s.length;
-	this.gl = gl;
+	var gl = GL.gl;
 	this.shaderProgram = GL.createProgram(shader.DisplayObjectVertex,shader.DisplayObjectFragment);
 	this.vertexPositionAttribute = gl.getAttribLocation(this.shaderProgram,"vertexPosition");
 	this.vertexBuffer = gl.createBuffer();
@@ -965,21 +964,22 @@ GLDisplayListRenderer.prototype.init = function(gl) {
 GLDisplayListRenderer.prototype.render = function(width,height) {
 	$s.push("GLDisplayListRenderer::render");
 	var $spos = $s.length;
+	var gl = GL.gl;
 	GL.useProgram(this.shaderProgram);
-	this.gl.viewport(0,0,width,height);
-	this.gl.enable(this.gl.BLEND);
-	this.gl.blendFunc(this.gl.SRC_ALPHA,this.gl.ONE_MINUS_SRC_ALPHA);
-	this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.vertexBuffer);
+	gl.viewport(0,0,width,height);
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+	gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
 	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-	this.gl.vertexAttribPointer(this.vertexPositionAttribute,2,this.gl.BYTE,false,0,0);
+	gl.vertexAttribPointer(this.vertexPositionAttribute,2,gl.BYTE,false,0,0);
 	var projectionMatrix = new Matrix4();
 	projectionMatrix.ortho(0,width,height,0,0,1);
-	this.gl.uniformMatrix4fv(this.projectionMatrixUniform.location,false,projectionMatrix.buffer);
+	gl.uniformMatrix4fv(this.projectionMatrixUniform.location,false,projectionMatrix.buffer);
 	var stage = GLDisplayList.getDefault().stage;
-	this.gl.activeTexture(this.gl.TEXTURE0);
-	this.gl.uniform1i(this.textureUniform.location,0);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.uniform1i(this.textureUniform.location,0);
 	this.renderRecursive(stage,new Matrix4());
-	this.gl.disable(this.gl.BLEND);
+	gl.disable(gl.BLEND);
 	$s.pop();
 }
 GLDisplayListRenderer.prototype.renderRecursive = function(displayObjectContainer,parentMatrix) {
@@ -999,6 +999,7 @@ GLDisplayListRenderer.prototype.renderRecursive = function(displayObjectContaine
 GLDisplayListRenderer.prototype.renderDisplayObject = function(displayObject,parentMatrix) {
 	$s.push("GLDisplayListRenderer::renderDisplayObject");
 	var $spos = $s.length;
+	var gl = GL.gl;
 	displayObject.validateTransform();
 	var result = new Matrix4();
 	result.multiply(parentMatrix);
@@ -1009,24 +1010,24 @@ GLDisplayListRenderer.prototype.renderDisplayObject = function(displayObject,par
 	}
 	var texture;
 	if(!this.textures.exists(displayObject.id)) {
-		texture = this.gl.createTexture();
-		this.gl.bindTexture(this.gl.TEXTURE_2D,texture);
-		this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MAG_FILTER,this.gl.NEAREST);
-		this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MIN_FILTER,this.gl.NEAREST);
+		texture = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D,texture);
+		gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
 		this.textures.set(displayObject.id,texture);
 	}
 	else {
 		texture = this.textures.get(displayObject.id);
-		this.gl.bindTexture(this.gl.TEXTURE_2D,texture);
+		gl.bindTexture(gl.TEXTURE_2D,texture);
 	}
 	if(displayObject.canvasIsInvalid) {
-		this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGBA,this.gl.RGBA,this.gl.UNSIGNED_BYTE,displayObject.getCanvas());
+		gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,displayObject.getCanvas());
 		displayObject.canvasIsInvalid = false;
 	}
-	this.gl.uniformMatrix4fv(this.objectMatrixUniform.location,false,result.buffer);
-	this.gl.uniform2f(this.sizeUniform.location,displayObject.width,displayObject.height);
-	this.gl.uniform1f(this.alphaUniform.location,displayObject.alpha);
-	this.gl.drawArrays(this.gl.TRIANGLE_STRIP,0,4);
+	gl.uniformMatrix4fv(this.objectMatrixUniform.location,false,result.buffer);
+	gl.uniform2f(this.sizeUniform.location,displayObject.width,displayObject.height);
+	gl.uniform1f(this.alphaUniform.location,displayObject.alpha);
+	gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 	{
 		$s.pop();
 		return result;
@@ -1347,6 +1348,43 @@ List.prototype.map = function(f) {
 	$s.pop();
 }
 List.prototype.__class__ = List;
+GLAttribLocation = function(p) { if( p === $_ ) return; {
+	$s.push("GLAttribLocation::new");
+	var $spos = $s.length;
+	null;
+	$s.pop();
+}}
+GLAttribLocation.__name__ = ["GLAttribLocation"];
+GLAttribLocation.prototype.location = null;
+GLAttribLocation.prototype.size = null;
+GLAttribLocation.prototype.type = null;
+GLAttribLocation.prototype.buffer = null;
+GLAttribLocation.prototype.currentLength = null;
+GLAttribLocation.prototype.updateBuffer = function(arrayBuffer) {
+	$s.push("GLAttribLocation::updateBuffer");
+	var $spos = $s.length;
+	if(this.buffer != null) GL.gl.deleteBuffer(this.buffer);
+	this.currentLength = arrayBuffer.byteLength;
+	this.buffer = GL.createArrayBuffer(arrayBuffer);
+	$s.pop();
+}
+GLAttribLocation.prototype.vertexAttribPointer = function() {
+	$s.push("GLAttribLocation::vertexAttribPointer");
+	var $spos = $s.length;
+	GL.gl.bindBuffer(34962,this.buffer);
+	GL.gl.enableVertexAttribArray(this.location);
+	GL.gl.vertexAttribPointer(this.location,this.size,this.type,false,0,0);
+	$s.pop();
+}
+GLAttribLocation.prototype.drawArrays = function(mode,first,count) {
+	$s.push("GLAttribLocation::drawArrays");
+	var $spos = $s.length;
+	if(first == null) first = 0;
+	if(count == null) count = this.currentLength / this.size;
+	GL.gl.drawArrays(mode,first,count);
+	$s.pop();
+}
+GLAttribLocation.prototype.__class__ = GLAttribLocation;
 GLFramebufferFactory = function(gl) { if( gl === $_ ) return; {
 	$s.push("GLFramebufferFactory::new");
 	var $spos = $s.length;
@@ -3195,54 +3233,6 @@ sa.view.shader.PlanktonVertex.prototype.__class__ = sa.view.shader.PlanktonVerte
 sa.view.shader.Texture = function() { }
 sa.view.shader.Texture.__name__ = ["sa","view","shader","Texture"];
 sa.view.shader.Texture.prototype.__class__ = sa.view.shader.Texture;
-sa.view.BackgroundRenderer = function(p) { if( p === $_ ) return; {
-	$s.push("sa.view.BackgroundRenderer::new");
-	var $spos = $s.length;
-	null;
-	$s.pop();
-}}
-sa.view.BackgroundRenderer.__name__ = ["sa","view","BackgroundRenderer"];
-sa.view.BackgroundRenderer.prototype.texture = null;
-sa.view.BackgroundRenderer.prototype.projectionMatrix = null;
-sa.view.BackgroundRenderer.prototype.cameraMatrix = null;
-sa.view.BackgroundRenderer.prototype.shaderProgram = null;
-sa.view.BackgroundRenderer.prototype.vertexPositionAttribute = null;
-sa.view.BackgroundRenderer.prototype.vertexBuffer = null;
-sa.view.BackgroundRenderer.prototype.textureUniform = null;
-sa.view.BackgroundRenderer.prototype.projectionMatrixUniform = null;
-sa.view.BackgroundRenderer.prototype.viewWorldMatrixUniform = null;
-sa.view.BackgroundRenderer.prototype.init = function() {
-	$s.push("sa.view.BackgroundRenderer::init");
-	var $spos = $s.length;
-	this.shaderProgram = GL.createProgram(sa.view.shader.PassVertex2,sa.view.shader.Texture);
-	this.vertexPositionAttribute = GL.gl.getAttribLocation(this.shaderProgram,"vertexPosition");
-	this.vertexBuffer = GL.createArrayBuffer(new Int8Array([1,-1,-1,1,-1,-1,1,-1,1,1,-1,1]));
-	this.textureUniform = GL.getUniformLocation("texture");
-	this.projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
-	this.viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
-	$s.pop();
-}
-sa.view.BackgroundRenderer.prototype.render = function(width,height) {
-	$s.push("sa.view.BackgroundRenderer::render");
-	var $spos = $s.length;
-	GL.useProgram(this.shaderProgram);
-	GL.gl.viewport(0,0,width,height);
-	GL.gl.bindBuffer(34962,this.vertexBuffer);
-	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-	GL.gl.vertexAttribPointer(this.vertexPositionAttribute,2,5120,false,0,0);
-	GL.gl.uniformMatrix4fv(this.projectionMatrixUniform.location,false,this.projectionMatrix.buffer);
-	var viewWorldMatrix = new Matrix4(this.cameraMatrix);
-	viewWorldMatrix.appendScale(1,-1,1);
-	viewWorldMatrix.appendTranslation(0,0,-40);
-	viewWorldMatrix.appendScale(80,80,1);
-	GL.gl.uniformMatrix4fv(this.viewWorldMatrixUniform.location,false,viewWorldMatrix.buffer);
-	GL.gl.activeTexture(33984);
-	GL.gl.bindTexture(3553,this.texture.texture);
-	GL.gl.uniform1i(this.textureUniform.location,0);
-	GL.gl.drawArrays(4,0,6);
-	$s.pop();
-}
-sa.view.BackgroundRenderer.prototype.__class__ = sa.view.BackgroundRenderer;
 Vec4 = function(x,y,z,w) { if( x === $_ ) return; {
 	$s.push("Vec4::new");
 	var $spos = $s.length;
@@ -3364,6 +3354,54 @@ Vec4.prototype.cloneToVec3 = function() {
 	$s.pop();
 }
 Vec4.prototype.__class__ = Vec4;
+sa.view.BackgroundRenderer = function(p) { if( p === $_ ) return; {
+	$s.push("sa.view.BackgroundRenderer::new");
+	var $spos = $s.length;
+	null;
+	$s.pop();
+}}
+sa.view.BackgroundRenderer.__name__ = ["sa","view","BackgroundRenderer"];
+sa.view.BackgroundRenderer.prototype.texture = null;
+sa.view.BackgroundRenderer.prototype.projectionMatrix = null;
+sa.view.BackgroundRenderer.prototype.cameraMatrix = null;
+sa.view.BackgroundRenderer.prototype.shaderProgram = null;
+sa.view.BackgroundRenderer.prototype.vertexPositionAttribute = null;
+sa.view.BackgroundRenderer.prototype.vertexBuffer = null;
+sa.view.BackgroundRenderer.prototype.textureUniform = null;
+sa.view.BackgroundRenderer.prototype.projectionMatrixUniform = null;
+sa.view.BackgroundRenderer.prototype.viewWorldMatrixUniform = null;
+sa.view.BackgroundRenderer.prototype.init = function() {
+	$s.push("sa.view.BackgroundRenderer::init");
+	var $spos = $s.length;
+	this.shaderProgram = GL.createProgram(sa.view.shader.PassVertex2,sa.view.shader.Texture);
+	this.vertexPositionAttribute = GL.getAttribLocation2("vertexPosition",2,5120);
+	this.vertexPositionAttribute.updateBuffer(new Int8Array([-1,-1,1,-1,-1,1,1,1]));
+	this.textureUniform = GL.getUniformLocation("texture");
+	this.projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
+	this.viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
+	$s.pop();
+}
+sa.view.BackgroundRenderer.prototype.render = function(width,height) {
+	$s.push("sa.view.BackgroundRenderer::render");
+	var $spos = $s.length;
+	GL.useProgram(this.shaderProgram);
+	GL.gl.viewport(0,0,width,height);
+	GL.gl.uniformMatrix4fv(this.projectionMatrixUniform.location,false,this.projectionMatrix.buffer);
+	var viewWorldMatrix = new Matrix4(this.cameraMatrix);
+	viewWorldMatrix.appendScale(1,-1,1);
+	viewWorldMatrix.appendTranslation(0,0,-40);
+	viewWorldMatrix.appendScale(80,80,1);
+	GL.gl.uniformMatrix4fv(this.viewWorldMatrixUniform.location,false,viewWorldMatrix.buffer);
+	{
+		GL.gl.activeTexture(33984);
+		GL.gl.bindTexture(3553,this.texture.texture);
+		GL.gl.uniform1i(this.textureUniform.location,0);
+	}
+	this.vertexPositionAttribute.vertexAttribPointer();
+	this.vertexPositionAttribute.drawArrays(5);
+	$s.pop();
+}
+sa.view.BackgroundRenderer.prototype.__class__ = sa.view.BackgroundRenderer;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -5239,7 +5277,6 @@ sa.view.PlanktonRenderer.prototype.numParticlesEachSide = null;
 sa.view.PlanktonRenderer.prototype.objectMatrix = null;
 sa.view.PlanktonRenderer.prototype.shadowMatrix = null;
 sa.view.PlanktonRenderer.prototype.vertexPositionAttribute = null;
-sa.view.PlanktonRenderer.prototype.vertexBuffer = null;
 sa.view.PlanktonRenderer.prototype.shaderProgram = null;
 sa.view.PlanktonRenderer.prototype.perspectiveMatrixUniform = null;
 sa.view.PlanktonRenderer.prototype.objectMatrixUniform = null;
@@ -5249,7 +5286,6 @@ sa.view.PlanktonRenderer.prototype.elapsedTimeUniform = null;
 sa.view.PlanktonRenderer.prototype.attractorPositionUniform = null;
 sa.view.PlanktonRenderer.prototype.peakIncrementUniform = null;
 sa.view.PlanktonRenderer.prototype.peakUniform = null;
-sa.view.PlanktonRenderer.prototype.vertexes = null;
 sa.view.PlanktonRenderer.prototype.startTime = null;
 sa.view.PlanktonRenderer.prototype.lastTime = null;
 sa.view.PlanktonRenderer.prototype.kuler = null;
@@ -5259,7 +5295,8 @@ sa.view.PlanktonRenderer.prototype.init = function() {
 	$s.push("sa.view.PlanktonRenderer::init");
 	var $spos = $s.length;
 	this.shaderProgram = GL.createProgram(sa.view.shader.PlanktonVertex,sa.view.shader.Color);
-	this.vertexPositionAttribute = GL.gl.getAttribLocation(this.shaderProgram,"vertexPosition");
+	this.vertexPositionAttribute = GL.getAttribLocation2("vertexPosition",3,5126);
+	this.vertexPositionAttribute.updateBuffer(this.computeVertexes());
 	this.perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
 	this.objectMatrixUniform = GL.getUniformLocation("objectMatrix");
 	this.rotationMatrixUniform = GL.getUniformLocation("rotationMatrix");
@@ -5268,15 +5305,13 @@ sa.view.PlanktonRenderer.prototype.init = function() {
 	this.attractorPositionUniform = GL.getUniformLocation("attractorPosition");
 	this.peakUniform = GL.getUniformLocation("peak");
 	this.peakIncrementUniform = GL.getUniformLocation("peakIncrement");
-	this.calculatePositions();
-	this.vertexBuffer = GL.createArrayBuffer(this.vertexes);
 	this.startTime = Date.now().getTime();
 	$s.pop();
 }
-sa.view.PlanktonRenderer.prototype.calculatePositions = function() {
-	$s.push("sa.view.PlanktonRenderer::calculatePositions");
+sa.view.PlanktonRenderer.prototype.computeVertexes = function() {
+	$s.push("sa.view.PlanktonRenderer::computeVertexes");
 	var $spos = $s.length;
-	this.vertexes = new Float32Array(this.numParticles * 3);
+	var vertexes = new Float32Array(this.numParticles * 3);
 	var particleSize = 250;
 	var i = 0;
 	{
@@ -5289,12 +5324,16 @@ sa.view.PlanktonRenderer.prototype.calculatePositions = function() {
 				var mx = (x - this.numParticlesEachSide / 2) / this.numParticlesEachSide * particleSize * 0.2;
 				var my = (y - this.numParticlesEachSide / 2) / this.numParticlesEachSide * particleSize * 0.3;
 				var mz = 0;
-				this.vertexes[i * 3] = mx;
-				this.vertexes[i * 3 + 1] = my;
-				this.vertexes[i * 3 + 2] = mz * 1.0;
+				vertexes[i * 3] = mx;
+				vertexes[i * 3 + 1] = my;
+				vertexes[i * 3 + 2] = mz * 1.0;
 				i++;
 			}
 		}
+	}
+	{
+		$s.pop();
+		return vertexes;
 	}
 	$s.pop();
 }
@@ -5328,10 +5367,8 @@ sa.view.PlanktonRenderer.prototype.render = function(width,height) {
 	GL.gl.uniform1f(this.peakIncrementUniform.location,this.peakIncrement);
 	GL.gl.uniform1f(this.peakUniform.location,this.peak);
 	this.attractorPositionUniform.setVec3(this.attractorPosition);
-	GL.gl.bindBuffer(34962,this.vertexBuffer);
-	GL.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-	GL.gl.vertexAttribPointer(this.vertexPositionAttribute,3,5126,false,0,0);
-	GL.gl.drawArrays(1,0,this.numParticles);
+	this.vertexPositionAttribute.vertexAttribPointer();
+	this.vertexPositionAttribute.drawArrays(1,0,this.numParticles);
 	GL.gl.disable(3042);
 	$s.pop();
 }
@@ -6586,6 +6623,15 @@ GLUniformLocation.prototype.setRGB = function(color) {
 	GL.gl.uniform3f(this.location,color.r,color.g,color.b);
 	$s.pop();
 }
+GLUniformLocation.prototype.setTexture = function(texture,index) {
+	$s.push("GLUniformLocation::setTexture");
+	var $spos = $s.length;
+	if(index == null) index = 0;
+	GL.gl.activeTexture(33984 + index);
+	GL.gl.bindTexture(3553,texture.texture);
+	GL.gl.uniform1i(this.location,index);
+	$s.pop();
+}
 GLUniformLocation.prototype.__class__ = GLUniformLocation;
 GLMathUtil = function() { }
 GLMathUtil.__name__ = ["GLMathUtil"];
@@ -6832,6 +6878,34 @@ sa.view.Flighter.prototype.scale = null;
 sa.view.Flighter.prototype.rnd1 = null;
 sa.view.Flighter.prototype.rnd2 = null;
 sa.view.Flighter.prototype.__class__ = sa.view.Flighter;
+sa.view.TextureId = { __ename__ : ["sa","view","TextureId"], __constructs__ : ["STRIPE1","STRIPE2","BACKGROUND","STONES_RIGHT","STONES_LEFT","ROCK_LEFT","ROCK_RIGHT","CREDITS","FLIGHTER"] }
+sa.view.TextureId.STRIPE1 = ["STRIPE1",0];
+sa.view.TextureId.STRIPE1.toString = $estr;
+sa.view.TextureId.STRIPE1.__enum__ = sa.view.TextureId;
+sa.view.TextureId.STRIPE2 = ["STRIPE2",1];
+sa.view.TextureId.STRIPE2.toString = $estr;
+sa.view.TextureId.STRIPE2.__enum__ = sa.view.TextureId;
+sa.view.TextureId.BACKGROUND = ["BACKGROUND",2];
+sa.view.TextureId.BACKGROUND.toString = $estr;
+sa.view.TextureId.BACKGROUND.__enum__ = sa.view.TextureId;
+sa.view.TextureId.STONES_RIGHT = ["STONES_RIGHT",3];
+sa.view.TextureId.STONES_RIGHT.toString = $estr;
+sa.view.TextureId.STONES_RIGHT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.STONES_LEFT = ["STONES_LEFT",4];
+sa.view.TextureId.STONES_LEFT.toString = $estr;
+sa.view.TextureId.STONES_LEFT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.ROCK_LEFT = ["ROCK_LEFT",5];
+sa.view.TextureId.ROCK_LEFT.toString = $estr;
+sa.view.TextureId.ROCK_LEFT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.ROCK_RIGHT = ["ROCK_RIGHT",6];
+sa.view.TextureId.ROCK_RIGHT.toString = $estr;
+sa.view.TextureId.ROCK_RIGHT.__enum__ = sa.view.TextureId;
+sa.view.TextureId.CREDITS = ["CREDITS",7];
+sa.view.TextureId.CREDITS.toString = $estr;
+sa.view.TextureId.CREDITS.__enum__ = sa.view.TextureId;
+sa.view.TextureId.FLIGHTER = ["FLIGHTER",8];
+sa.view.TextureId.FLIGHTER.toString = $estr;
+sa.view.TextureId.FLIGHTER.__enum__ = sa.view.TextureId;
 if(typeof ease=='undefined') ease = {}
 ease.Quad = function() { }
 ease.Quad.__name__ = ["ease","Quad"];
@@ -6871,34 +6945,6 @@ ease.Quad.easeInOut = function(t,b,c,d) {
 	$s.pop();
 }
 ease.Quad.prototype.__class__ = ease.Quad;
-sa.view.TextureId = { __ename__ : ["sa","view","TextureId"], __constructs__ : ["STRIPE1","STRIPE2","BACKGROUND","STONES_RIGHT","STONES_LEFT","ROCK_LEFT","ROCK_RIGHT","CREDITS","FLIGHTER"] }
-sa.view.TextureId.STRIPE1 = ["STRIPE1",0];
-sa.view.TextureId.STRIPE1.toString = $estr;
-sa.view.TextureId.STRIPE1.__enum__ = sa.view.TextureId;
-sa.view.TextureId.STRIPE2 = ["STRIPE2",1];
-sa.view.TextureId.STRIPE2.toString = $estr;
-sa.view.TextureId.STRIPE2.__enum__ = sa.view.TextureId;
-sa.view.TextureId.BACKGROUND = ["BACKGROUND",2];
-sa.view.TextureId.BACKGROUND.toString = $estr;
-sa.view.TextureId.BACKGROUND.__enum__ = sa.view.TextureId;
-sa.view.TextureId.STONES_RIGHT = ["STONES_RIGHT",3];
-sa.view.TextureId.STONES_RIGHT.toString = $estr;
-sa.view.TextureId.STONES_RIGHT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.STONES_LEFT = ["STONES_LEFT",4];
-sa.view.TextureId.STONES_LEFT.toString = $estr;
-sa.view.TextureId.STONES_LEFT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.ROCK_LEFT = ["ROCK_LEFT",5];
-sa.view.TextureId.ROCK_LEFT.toString = $estr;
-sa.view.TextureId.ROCK_LEFT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.ROCK_RIGHT = ["ROCK_RIGHT",6];
-sa.view.TextureId.ROCK_RIGHT.toString = $estr;
-sa.view.TextureId.ROCK_RIGHT.__enum__ = sa.view.TextureId;
-sa.view.TextureId.CREDITS = ["CREDITS",7];
-sa.view.TextureId.CREDITS.toString = $estr;
-sa.view.TextureId.CREDITS.__enum__ = sa.view.TextureId;
-sa.view.TextureId.FLIGHTER = ["FLIGHTER",8];
-sa.view.TextureId.FLIGHTER.toString = $estr;
-sa.view.TextureId.FLIGHTER.__enum__ = sa.view.TextureId;
 sa.view.shader.UnderWater = function() { }
 sa.view.shader.UnderWater.__name__ = ["sa","view","shader","UnderWater"];
 sa.view.shader.UnderWater.prototype.__class__ = sa.view.shader.UnderWater;
@@ -7146,13 +7192,12 @@ sa.view.CanvasView.prototype.handleLauncherStart = function(event) {
 	this.saRenderer = new sa.view.StrangeAttractorRenderer();
 	this.saRenderer.projectionMatrix = this.commonModel.projectionMatrix;
 	this.saRenderer.cameraMatrix = this.commonModel.cameraMatrix;
-	this.saRenderer.init(this.gl);
 	this.rocksRenderer = new sa.view.RocksRenderer();
 	this.rocksRenderer.textureRegistry = this.textureRegistry;
 	this.rocksRenderer.projectionMatrix = this.commonModel.projectionMatrix;
 	this.rocksRenderer.cameraMatrix = this.commonModel.cameraMatrix;
 	this.displayListRenderer = new GLDisplayListRenderer();
-	this.displayListRenderer.init(this.gl);
+	this.displayListRenderer.init();
 	var inst = this;
 	GLTimeout.executeLater(1000,function() {
 		$s.push("sa.view.CanvasView::handleLauncherStart@86");
@@ -7210,7 +7255,6 @@ sa.view.CanvasView.prototype.renderScene = function() {
 	this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,null);
 	this.gl.viewport(0,0,this.canvas.width,this.canvas.height);
 	this.saRenderer.peak = this.commonModel.peak;
-	this.saRenderer.render(this.canvas.width,this.canvas.height);
 	this.gl.enable(this.gl.BLEND);
 	this.gl.blendFunc(this.gl.SRC_ALPHA,this.gl.ONE);
 	this.gl.disable(this.gl.BLEND);
@@ -7703,7 +7747,9 @@ GL.currentProgramm = null;
 GL.initGL = function(canvas,antialias) {
 	$s.push("GL::initGL");
 	var $spos = $s.length;
-	GL.gl = canvas.getContext("experimental-webgl",{ antialias : antialias});
+	var params = { antialias : antialias};
+	GL.gl = canvas.getContext("webgl",params);
+	if(GL.gl == null) GL.gl = canvas.getContext("experimental-webgl",params);
 	if(GL.gl == null) {
 		throw "Could not initialise WebGL.";
 	}
@@ -7773,9 +7819,24 @@ GL.getUniformLocation = function(name) {
 	$s.push("GL::getUniformLocation");
 	var $spos = $s.length;
 	var location = GL.gl.getUniformLocation(GL.currentProgramm,name);
-	if(location == null) haxe.Log.trace("Could not find " + name + " in shader",{ fileName : "GL.hx", lineNumber : 453, className : "GL", methodName : "getUniformLocation"});
+	if(location == null) haxe.Log.trace("Could not find " + name + " in shader",{ fileName : "GL.hx", lineNumber : 458, className : "GL", methodName : "getUniformLocation"});
 	var result = new GLUniformLocation();
 	result.location = location;
+	{
+		$s.pop();
+		return result;
+	}
+	$s.pop();
+}
+GL.getAttribLocation2 = function(name,size,type) {
+	$s.push("GL::getAttribLocation2");
+	var $spos = $s.length;
+	var location = GL.gl.getAttribLocation(GL.currentProgramm,name);
+	if(location == null) haxe.Log.trace("Could not find " + name + " in shader",{ fileName : "GL.hx", lineNumber : 469, className : "GL", methodName : "getAttribLocation2"});
+	var result = new GLAttribLocation();
+	result.location = location;
+	result.size = size;
+	result.type = type;
 	{
 		$s.pop();
 		return result;
@@ -7896,6 +7957,12 @@ GL.createShader = function(type) {
 		$s.pop();
 		return $tmp;
 	}
+	$s.pop();
+}
+GL.deleteBuffer = function(buffer) {
+	$s.push("GL::deleteBuffer");
+	var $spos = $s.length;
+	GL.gl.deleteBuffer(buffer);
 	$s.pop();
 }
 GL.disable = function(cap) {

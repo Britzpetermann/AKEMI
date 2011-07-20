@@ -360,9 +360,9 @@ class GL
 	public static inline var RENDERBUFFER_DEPTH_SIZE        = 0x8D54;
 	public static inline var RENDERBUFFER_STENCIL_SIZE      = 0x8D55;
 
-	public static inline var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE           = 0x8CD0;
-	public static inline var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME           = 0x8CD1;
-	public static inline var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         = 0x8CD2;
+	public static inline var FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE           	= 0x8CD0;
+	public static inline var FRAMEBUFFER_ATTACHMENT_OBJECT_NAME           	= 0x8CD1;
+	public static inline var FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         	= 0x8CD2;
 	public static inline var FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE	= 0x8CD3;
 
 	public static inline var COLOR_ATTACHMENT0              = 0x8CE0;
@@ -389,7 +389,12 @@ class GL
 
 	public static function initGL(canvas : Canvas, antialias : Bool) : WebGLRenderingContext
 	{
-		gl = canvas.getContext("experimental-webgl", {antialias : antialias});
+		var params = {antialias : antialias};
+
+		gl = canvas.getContext("webgl", params);
+		if (gl == null)
+			gl = canvas.getContext("experimental-webgl", params);
+
 		if (gl == null)
 		{
 			throw "Could not initialise WebGL.";
@@ -446,7 +451,7 @@ class GL
 		return vertexBuffer;
 	}
 
-	public static function getUniformLocation(name : String)
+	public static function getUniformLocation(name : String) : GLUniformLocation
 	{
 		var location = gl.getUniformLocation(currentProgramm, name);
 		if (location == null)
@@ -454,6 +459,19 @@ class GL
 
 		var result = new GLUniformLocation();
 		result.location = location;
+		return result;
+	}
+
+	public static function getAttribLocation2(name : String, size : GLint, type : GLenum) : GLAttribLocation
+	{
+		var location = gl.getAttribLocation(currentProgramm, name);
+		if (location == null)
+			trace ("Could not find " + name + " in shader");
+
+		var result = new GLAttribLocation();
+		result.location = location;
+		result.size = size;
+		result.type = type;
 		return result;
 	}
 
@@ -514,6 +532,11 @@ class GL
 		return gl.createShader(type);
 	}
 
+	public static inline function deleteBuffer(buffer : WebGLBuffer) : Void
+	{
+		gl.deleteBuffer(buffer);
+	}
+
 	public static inline function disable(cap : GLenum) : Void
 	{
 		gl.disable(cap);
@@ -536,8 +559,8 @@ class GL
 
 	public static inline function framebufferRenderbuffer(target : GLenum, attachment : GLenum, renderbuffertarget : GLenum, renderbuffer : WebGLRenderbuffer) : Void;
 	public static inline function framebufferTexture2D(target : GLenum, attachment : GLenum, textarget : GLenum, texture : WebGLTexture, level : GLint) : Void;
-
 	public static inline function generateMipmap(target : GLenum) : Void;
+
 	public static inline function getAttribLocation(program : WebGLProgram, name : DOMString) : GLint
 	{
 		return gl.getAttribLocation(program, name);

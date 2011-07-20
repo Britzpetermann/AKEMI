@@ -71,7 +71,7 @@ class CanvasView implements Infos
 		saRenderer = new StrangeAttractorRenderer();
 		saRenderer.projectionMatrix = commonModel.projectionMatrix;
 		saRenderer.cameraMatrix = commonModel.cameraMatrix;
-		saRenderer.init(gl);
+		//saRenderer.init(gl);
 
 		rocksRenderer = new RocksRenderer();
 		rocksRenderer.textureRegistry = textureRegistry;
@@ -80,7 +80,7 @@ class CanvasView implements Infos
 		//rocksRenderer.init(gl);
 
 		displayListRenderer = new GLDisplayListRenderer();
-		displayListRenderer.init(gl);
+		displayListRenderer.init();
 
 		var inst = this;
 		GLTimeout.executeLater(1000, function()
@@ -145,7 +145,7 @@ class CanvasView implements Infos
 		gl.viewport(0, 0, canvas.width, canvas.height);
 
 		saRenderer.peak = commonModel.peak;
-		saRenderer.render(canvas.width, canvas.height);
+		//saRenderer.render(canvas.width, canvas.height);
 
 		//creditsRenderer.render(canvas.width, canvas.height);
 

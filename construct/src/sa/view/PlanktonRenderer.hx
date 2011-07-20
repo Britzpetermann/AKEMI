@@ -15,8 +15,7 @@ class PlanktonRenderer
 	var objectMatrix : Matrix4;
 	var shadowMatrix : Matrix4;
 
-	var vertexPositionAttribute : Float;
-	var vertexBuffer : WebGLBuffer;
+	var vertexPositionAttribute : GLAttribLocation;
 
 	var shaderProgram : WebGLProgram;
 	var perspectiveMatrixUniform : GLUniformLocation;
@@ -27,8 +26,6 @@ class PlanktonRenderer
 	var attractorPositionUniform : GLUniformLocation;
 	var peakIncrementUniform : GLUniformLocation;
 	var peakUniform : GLUniformLocation;
-
-	var vertexes : Float32Array;
 
 	var startTime : Float;
 	var lastTime : Float;
@@ -64,7 +61,8 @@ class PlanktonRenderer
 	{
 		shaderProgram = GL.createProgram(sa.view.shader.PlanktonVertex, sa.view.shader.Color);
 
-		vertexPositionAttribute = GL.getAttribLocation(shaderProgram, "vertexPosition");
+		vertexPositionAttribute = GL.getAttribLocation2("vertexPosition", 3, GL.FLOAT);
+		vertexPositionAttribute.updateBuffer(computeVertexes());
 
 		perspectiveMatrixUniform = GL.getUniformLocation("perspectiveMatrix");
 		objectMatrixUniform = GL.getUniformLocation("objectMatrix");
@@ -75,20 +73,15 @@ class PlanktonRenderer
 		peakUniform = GL.getUniformLocation("peak");
 		peakIncrementUniform = GL.getUniformLocation("peakIncrement");
 
-		calculatePositions();
-
-		vertexBuffer = GL.createArrayBuffer(vertexes);
-
 		startTime = Date.now().getTime();
 	}
 
-	function calculatePositions()
+	function computeVertexes()
 	{
-		vertexes = new Float32Array(numParticles * 3);
+		var vertexes = new Float32Array(numParticles * 3);
 
 		var particleSize = 250;
 
-		//plane1
 		var i = 0;
 		for (x in 0 ... numParticlesEachSide)
 		for (y in 0 ... numParticlesEachSide)
@@ -104,12 +97,12 @@ class PlanktonRenderer
 
 			i++;
 		}
+
+		return vertexes;
 	}
 
 	public function render(width : Float, height : Float)
 	{
-		//var gl = GL.gl;
-
 		peakIncrement += peak;
 		var time = Date.now().getTime();
 		var elapsedClickTime = time - clickTime;
@@ -146,11 +139,8 @@ class PlanktonRenderer
 		peakUniform.uniform1f(peak);
 		attractorPositionUniform.setVec3(attractorPosition);
 
-		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-		GL.enableVertexAttribArray(vertexPositionAttribute);
-		GL.vertexAttribPointer(vertexPositionAttribute, 3, GL.FLOAT, false, 0, 0);
-
-		GL.drawArrays(GL.LINES, 0, numParticles);
+		vertexPositionAttribute.vertexAttribPointer();
+		vertexPositionAttribute.drawArrays(GL.LINES, 0, numParticles);
 
 		GL.disable(GL.BLEND);
 	}

@@ -9,7 +9,7 @@ class BackgroundRenderer
 	public var cameraMatrix : Matrix4;
 
 	var shaderProgram : WebGLProgram;
-	var vertexPositionAttribute : Float;
+	var vertexPositionAttribute : GLAttribLocation;
 	var vertexBuffer : WebGLBuffer;
 
 	var textureUniform : GLUniformLocation;
@@ -22,15 +22,12 @@ class BackgroundRenderer
 	{
 		shaderProgram = GL.createProgram(sa.view.shader.PassVertex2, sa.view.shader.Texture);
 
-		vertexPositionAttribute = GL.getAttribLocation(shaderProgram, "vertexPosition");
-
-		vertexBuffer = GL.createArrayBuffer(new Int8Array([
-			1, -1,
-			-1,  1,
+		vertexPositionAttribute = GL.getAttribLocation2("vertexPosition", 2, GL.BYTE);
+		vertexPositionAttribute.updateBuffer(new Int8Array([
 			-1, -1,
 			1, -1,
-			1,  1,
-			-1,  1,
+			-1, 1,
+			1, 1,
 		]));
 
 		textureUniform = GL.getUniformLocation("texture");
@@ -43,21 +40,17 @@ class BackgroundRenderer
 		GL.useProgram(shaderProgram);
 		GL.viewport(0, 0, width, height);
 
-		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-		GL.enableVertexAttribArray(vertexPositionAttribute);
-		GL.vertexAttribPointer(vertexPositionAttribute, 2, GL.BYTE, false, 0, 0);
 		projectionMatrixUniform.setMatrix4(projectionMatrix);
 
 		var viewWorldMatrix = new Matrix4(cameraMatrix);
 		viewWorldMatrix.appendScale(1,-1,1);
 		viewWorldMatrix.appendTranslation(0, 0, -40);
 		viewWorldMatrix.appendScale(80, 80, 1);
-		viewWorldMatrixUniform.uniformMatrix4fv(viewWorldMatrix.buffer);
+		viewWorldMatrixUniform.setMatrix4(viewWorldMatrix);
 
-		GL.activeTexture(GL.TEXTURE0);
-		GL.bindTexture(GL.TEXTURE_2D, texture.texture);
-		textureUniform.uniform1i(0);
+		textureUniform.setTexture(texture);
 
-		GL.drawArrays(GL.TRIANGLES, 0, 6);
+		vertexPositionAttribute.vertexAttribPointer();
+		vertexPositionAttribute.drawArrays(GL.TRIANGLE_STRIP);
 	}
 }

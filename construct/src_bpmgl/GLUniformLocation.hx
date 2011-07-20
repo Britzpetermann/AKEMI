@@ -115,4 +115,11 @@ class GLUniformLocation
 	{
 		GL.gl.uniform3f(location, color.r, color.g, color.b);
 	}
+
+	public inline function setTexture(texture : GLTexture, ?index : GLint = 0) : Void
+	{
+		GL.activeTexture(cast GL.TEXTURE0 + index);
+		GL.bindTexture(GL.TEXTURE_2D, texture.texture);
+		uniform1i(index);
+	}
 }

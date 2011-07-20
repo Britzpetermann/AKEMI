@@ -1,4 +1,4 @@
-extern interface ArrayBuffer implements ArrayAccess<Dynamic>
+extern class ArrayBuffer implements ArrayAccess<Dynamic>
 {
-
+	public var byteLength : Float;
 }

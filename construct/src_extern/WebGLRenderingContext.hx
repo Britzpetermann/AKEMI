@@ -79,7 +79,8 @@ extern class WebGLRenderingContext
 	function createTexture() : WebGLTexture;
 	function createShader(type : GLenum) : WebGLShader;
 
-	function disable(cap : GLenum):Void;
+	function deleteBuffer(buffer : WebGLBuffer) : Void;
+	function disable(cap : GLenum) : Void;
 	function drawArrays(mode : GLenum, first : GLint, count : GLsizei) : Void;
 
 	function enable(cap : GLenum):Void;

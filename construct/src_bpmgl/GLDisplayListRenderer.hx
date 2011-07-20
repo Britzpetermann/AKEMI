@@ -2,8 +2,6 @@ import js.Lib;
 
 class GLDisplayListRenderer
 {
-	var gl : WebGLRenderingContext;
-
 	var shaderProgram : WebGLProgram;
 	var vertexPositionAttribute : Float;
 	var vertexBuffer : WebGLBuffer;
@@ -21,9 +19,9 @@ class GLDisplayListRenderer
 		textures = new IntHash();
 	}
 
-	public function init(gl : WebGLRenderingContext)
+	public function init()
 	{
-		this.gl = gl;
+		var gl = GL.gl;
 
 		shaderProgram = GL.createProgram(shader.DisplayObjectVertex, shader.DisplayObjectFragment);
 
@@ -48,6 +46,8 @@ class GLDisplayListRenderer
 
 	public function render(width : Float, height : Float)
 	{
+		var gl = GL.gl;
+
 		GL.useProgram(shaderProgram);
 		gl.viewport(0, 0, width, height);
 
@@ -85,6 +85,8 @@ class GLDisplayListRenderer
 
 	function renderDisplayObject(displayObject : GLDisplayObject, parentMatrix : Matrix4)
 	{
+		var gl = GL.gl;
+
 		displayObject.validateTransform();
 
 		var result = new Matrix4();
