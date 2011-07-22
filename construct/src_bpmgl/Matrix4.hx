@@ -171,26 +171,50 @@ class Matrix4
 		buffer[1] = 0;
 		buffer[2] = 0;
 		buffer[3] = 0;
+
 		buffer[4] = 0;
 		buffer[5] = (near * 2) / tb;
 		buffer[6] = 0;
 		buffer[7] = 0;
+
 		buffer[8] = (right + left) / rl;
 		buffer[9] = (top + bottom) / tb;
 		buffer[10] = -(far + near) / fn;
 		buffer[11] = -1;
+
 		buffer[12] = 0;
 		buffer[13] = 0;
 		buffer[14] = -(far * near * 2) / fn;
 		buffer[15] = 0;
 	}
 
+	public static function createTranslation(x : Float, y : Float, z : Float) : Matrix4
+	{
+		var result = new Matrix4();
+		result.buffer[0] = 1;
+		result.buffer[1] = 0;
+		result.buffer[2] = 0;
+		result.buffer[3] = 0;
+		result.buffer[4] = 0;
+		result.buffer[5] = 1;
+		result.buffer[6] = 0;
+		result.buffer[7] = 0;
+		result.buffer[8] = 0;
+		result.buffer[9] = 0;
+		result.buffer[10] = 1;
+		result.buffer[11] = 0;
+		result.buffer[12] = x;
+		result.buffer[13] = y;
+		result.buffer[14] = z;
+		result.buffer[15] = 1;
+
+		return result;
+	}
+
 	public function appendTranslation(x : Float, y : Float, z : Float)
 	{
-		buffer[12] = buffer[0]*x + buffer[4]*y + buffer[8]*z + buffer[12];
-		buffer[13] = buffer[1]*x + buffer[5]*y + buffer[9]*z + buffer[13];
-		buffer[14] = buffer[2]*x + buffer[6]*y + buffer[10]*z + buffer[14];
-		buffer[15] = buffer[3]*x + buffer[7]*y + buffer[11]*z + buffer[15];
+		var m = Matrix4.createTranslation(x, y, z);
+		multiply(m);
 	}
 
 	public function appendScale(x : Float, y : Float, z : Float)

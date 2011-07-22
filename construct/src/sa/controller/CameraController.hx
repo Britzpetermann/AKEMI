@@ -17,7 +17,7 @@ class CameraController implements Infos
 
 	public function new()
 	{
-		cameraPosition = new MoveSetVec2(new Vec2(0,0), new Vec2(0,0), new Vec2(0.0005,0.0005));
+		cameraPosition = new MoveSetVec2(new Vec2(0,0), new Vec2(0,0), new Vec2(0.1, 0.1));
 	}
 
 	@MessageHandler
@@ -30,18 +30,20 @@ class CameraController implements Infos
 	function tick()
 	{
 		var dt = Date.now().getTime() - lastTick;
+		lastTick = Date.now().getTime();
 		var factor = dt / 16;
 		cameraPosition.move(factor);
 
-		commonModel.cameraMatrix.lookAt(new Vec3(cameraPosition.current.x,cameraPosition.current.y,0), new Vec3(0,0,-9), new Vec3(0,1,0));
-		lastTick = Date.now().getTime();
+		commonModel.cameraMatrix.identity();
+		commonModel.cameraMatrix.lookAt(new Vec3(cameraPosition.current.x, 50 + cameraPosition.current.y, 50), new Vec3(0, 10, 0), new Vec3(0, 1, 0));
+		commonModel.cameraMatrix.appendScale(1, 1, -1);
 	}
 
 	function handleMouseMove(mousePos : Vec2)
 	{
 		var newPosition = mousePos.clone();
 		newPosition.subtract(0.5, 0.5);
-		newPosition.multiply(-5, 5);
+		newPosition.multiply(-100, 100);
 
 		cameraPosition.to = newPosition;
 	}

@@ -274,16 +274,20 @@ sa.view.FloorRenderer.prototype.vertexBuffer = null;
 sa.view.FloorRenderer.prototype.projectionMatrixUniform = null;
 sa.view.FloorRenderer.prototype.viewWorldMatrixUniform = null;
 sa.view.FloorRenderer.prototype.normalMatrixUniform = null;
-sa.view.FloorRenderer.prototype.lightPosUniform = null;
+sa.view.FloorRenderer.prototype.lightPositionsUniform = null;
+sa.view.FloorRenderer.prototype.lightDiffuseColorsUniform = null;
+sa.view.FloorRenderer.prototype.lightSpecularColorsUniform = null;
 sa.view.FloorRenderer.prototype.init = function() {
 	$s.push("sa.view.FloorRenderer::init");
 	var $spos = $s.length;
 	this.shaderProgram = GL.createProgram(sa.view.shader.FloorVertex,sa.view.shader.FloorFragment);
-	this.vertexPositionAttribute = GL.getAttribLocation2("vertexPosition",2,5120);
-	this.vertexPositionAttribute.updateBuffer(new Int8Array([-1,-1,1,-1,-1,1,1,1]));
+	this.vertexPositionAttribute = GL.getAttribLocation2("vertexPosition",3,5126);
+	this.vertexPositionAttribute.updateBuffer(new Float32Array([-1,0,-1,1,0,-1,-1,0,1,1,0,1]));
 	this.vertexNormalAttribute = GL.getAttribLocation2("vertexNormal",3,5120);
-	this.vertexNormalAttribute.updateBuffer(new Int8Array([0,0,1,0,0,1,0,0,1,0,0,1]));
-	this.lightPosUniform = GL.getUniformLocation("lightPos");
+	this.vertexNormalAttribute.updateBuffer(new Int8Array([0,1,0,0,1,0,0,1,0,0,1,0]));
+	this.lightPositionsUniform = GL.getUniformLocation("lightPositions");
+	this.lightDiffuseColorsUniform = GL.getUniformLocation("lightDiffuseColors");
+	this.lightSpecularColorsUniform = GL.getUniformLocation("lightSpecularColors");
 	this.projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
 	this.viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
 	this.normalMatrixUniform = GL.getUniformLocation("normalMatrix");
@@ -297,19 +301,43 @@ sa.view.FloorRenderer.prototype.render = function(width,height) {
 	GL.gl.viewport(0,0,width,height);
 	GL.gl.uniformMatrix4fv(this.projectionMatrixUniform.location,false,this.projectionMatrix.buffer);
 	var viewWorldMatrix = new Matrix4(this.cameraMatrix);
-	viewWorldMatrix.appendTranslation(0,-10,-40);
-	viewWorldMatrix.appendScale(40,40,1);
-	viewWorldMatrix.appendRotation(Math.PI / 2,new Vec3(1,0,0));
+	viewWorldMatrix.appendTranslation(0,0,0);
+	viewWorldMatrix.appendScale(50,50,50);
 	GL.gl.uniformMatrix4fv(this.viewWorldMatrixUniform.location,false,viewWorldMatrix.buffer);
 	var normalMatrix = viewWorldMatrix.toInverseMatrix3();
 	normalMatrix.transpose();
 	GL.gl.uniformMatrix3fv(this.normalMatrixUniform.location,false,normalMatrix.buffer);
 	this.vertexPositionAttribute.vertexAttribPointer();
 	this.vertexNormalAttribute.vertexAttribPointer();
-	var light = new Vec3(0,10,-30);
+	var lights = [];
+	var light = new Vec3(Math.sin(time / 1000) * 5,1,Math.cos(time / 1000) * 5);
 	light.transform(this.cameraMatrix);
-	GL.gl.uniform3f(this.lightPosUniform.location,light.x,light.y,light.z);
-	this.vertexPositionAttribute.drawArrays(5);
+	lights.push(light.x);
+	lights.push(light.y);
+	lights.push(light.z);
+	var light1 = new Vec3(Math.sin(time / 1000) * 20,2,Math.cos(time / 300) * 10);
+	light1.transform(this.cameraMatrix);
+	lights.push(light1.x);
+	lights.push(light1.y);
+	lights.push(light1.z);
+	GL.gl.uniform3fv(this.lightPositionsUniform.location,lights);
+	var diffuseColors = [];
+	diffuseColors.push(1.0);
+	diffuseColors.push(0);
+	diffuseColors.push(0);
+	diffuseColors.push(0);
+	diffuseColors.push(0);
+	diffuseColors.push(1);
+	GL.gl.uniform3fv(this.lightDiffuseColorsUniform.location,diffuseColors);
+	var specularColors = [];
+	specularColors.push(1.0);
+	specularColors.push(0.5);
+	specularColors.push(0.5);
+	specularColors.push(0.5);
+	specularColors.push(0.5);
+	specularColors.push(1);
+	GL.gl.uniform3fv(this.lightSpecularColorsUniform.location,specularColors);
+	this.vertexPositionAttribute.drawArrays(5,0,4);
 	$s.pop();
 }
 sa.view.FloorRenderer.prototype.__class__ = sa.view.FloorRenderer;
@@ -1766,7 +1794,7 @@ if(!sa.controller) sa.controller = {}
 sa.controller.CameraController = function(p) { if( p === $_ ) return; {
 	$s.push("sa.controller.CameraController::new");
 	var $spos = $s.length;
-	this.cameraPosition = new MoveSetVec2(new Vec2(0,0),new Vec2(0,0),new Vec2(0.0005,0.0005));
+	this.cameraPosition = new MoveSetVec2(new Vec2(0,0),new Vec2(0,0),new Vec2(0.1,0.1));
 	$s.pop();
 }}
 sa.controller.CameraController.__name__ = ["sa","controller","CameraController"];
@@ -1784,10 +1812,12 @@ sa.controller.CameraController.prototype.tick = function() {
 	$s.push("sa.controller.CameraController::tick");
 	var $spos = $s.length;
 	var dt = Date.now().getTime() - this.lastTick;
+	this.lastTick = Date.now().getTime();
 	var factor = dt / 16;
 	this.cameraPosition.move(factor);
-	this.commonModel.cameraMatrix.lookAt(new Vec3(this.cameraPosition.current.x,this.cameraPosition.current.y,0),new Vec3(0,0,-9),new Vec3(0,1,0));
-	this.lastTick = Date.now().getTime();
+	this.commonModel.cameraMatrix.identity();
+	this.commonModel.cameraMatrix.lookAt(new Vec3(this.cameraPosition.current.x,50 + this.cameraPosition.current.y,50),new Vec3(0,10,0),new Vec3(0,1,0));
+	this.commonModel.cameraMatrix.appendScale(1,1,-1);
 	$s.pop();
 }
 sa.controller.CameraController.prototype.handleMouseMove = function(mousePos) {
@@ -1795,7 +1825,7 @@ sa.controller.CameraController.prototype.handleMouseMove = function(mousePos) {
 	var $spos = $s.length;
 	var newPosition = mousePos.clone();
 	newPosition.subtract(0.5,0.5);
-	newPosition.multiply(-5,5);
+	newPosition.multiply(-100,100);
 	this.cameraPosition.to = newPosition;
 	$s.pop();
 }
@@ -2611,11 +2641,18 @@ GLAttribLocation.prototype.drawArrays = function(mode,first,count) {
 	$s.push("GLAttribLocation::drawArrays");
 	var $spos = $s.length;
 	if(first == null) first = 0;
-	if(count == null) count = this.currentLength / this.size;
+	if(count == null) {
+		count = this.currentLength / this.size;
+		if(this.type == 5126) count /= 4;
+	}
 	GL.gl.drawArrays(mode,first,count);
 	$s.pop();
 }
 GLAttribLocation.prototype.__class__ = GLAttribLocation;
+if(!sa.view.shader) sa.view.shader = {}
+sa.view.shader.DebugVertex = function() { }
+sa.view.shader.DebugVertex.__name__ = ["sa","view","shader","DebugVertex"];
+sa.view.shader.DebugVertex.prototype.__class__ = sa.view.shader.DebugVertex;
 bpmjs.TaskError = function(p) { if( p === $_ ) return; {
 	$s.push("bpmjs.TaskError::new");
 	var $spos = $s.length;
@@ -5753,6 +5790,12 @@ GLUniformLocation.prototype.setRGB = function(color) {
 	GL.gl.uniform3f(this.location,color.r,color.g,color.b);
 	$s.pop();
 }
+GLUniformLocation.prototype.setRGBA = function(color) {
+	$s.push("GLUniformLocation::setRGBA");
+	var $spos = $s.length;
+	GL.gl.uniform4f(this.location,color.r,color.g,color.b,color.a);
+	$s.pop();
+}
 GLUniformLocation.prototype.setTexture = function(texture,index) {
 	$s.push("GLUniformLocation::setTexture");
 	var $spos = $s.length;
@@ -6383,6 +6426,49 @@ bpmjs.ContextBuilder.prototype.createError = function(message) {
 	$s.pop();
 }
 bpmjs.ContextBuilder.prototype.__class__ = bpmjs.ContextBuilder;
+sa.view.DebugRenderer = function(p) { if( p === $_ ) return; {
+	$s.push("sa.view.DebugRenderer::new");
+	var $spos = $s.length;
+	null;
+	$s.pop();
+}}
+sa.view.DebugRenderer.__name__ = ["sa","view","DebugRenderer"];
+sa.view.DebugRenderer.prototype.projectionMatrix = null;
+sa.view.DebugRenderer.prototype.cameraMatrix = null;
+sa.view.DebugRenderer.prototype.shaderProgram = null;
+sa.view.DebugRenderer.prototype.vertexPositionAttribute = null;
+sa.view.DebugRenderer.prototype.vertexColorAttribute = null;
+sa.view.DebugRenderer.prototype.projectionMatrixUniform = null;
+sa.view.DebugRenderer.prototype.viewWorldMatrixUniform = null;
+sa.view.DebugRenderer.prototype.init = function() {
+	$s.push("sa.view.DebugRenderer::init");
+	var $spos = $s.length;
+	this.shaderProgram = GL.createProgram(sa.view.shader.DebugVertex,sa.view.shader.DebugFragment);
+	this.vertexPositionAttribute = GL.getAttribLocation2("vertexPosition",3,5126);
+	this.vertexPositionAttribute.updateBuffer(new Float32Array([0,0,0,1,0,0,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,1,1]));
+	this.vertexColorAttribute = GL.getAttribLocation2("vertexColor",4,5126);
+	this.vertexColorAttribute.updateBuffer(new Float32Array([0,0,0,1,1,0,0,1,0,1,0,1,1,1,0,1,0,0,1,1,1,0,1,1,0,1,1,1,1,1,1,1]));
+	this.projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
+	this.viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
+	$s.pop();
+}
+sa.view.DebugRenderer.prototype.render = function(width,height) {
+	$s.push("sa.view.DebugRenderer::render");
+	var $spos = $s.length;
+	var time = Date.now().getTime();
+	GL.useProgram(this.shaderProgram);
+	GL.gl.viewport(0,0,width,height);
+	GL.gl.uniformMatrix4fv(this.projectionMatrixUniform.location,false,this.projectionMatrix.buffer);
+	var viewWorldMatrix = new Matrix4(this.cameraMatrix);
+	viewWorldMatrix.appendScale(5,5,1);
+	viewWorldMatrix.appendEulerRotation(time / 2000,0,0);
+	GL.gl.uniformMatrix4fv(this.viewWorldMatrixUniform.location,false,viewWorldMatrix.buffer);
+	this.vertexColorAttribute.vertexAttribPointer();
+	this.vertexPositionAttribute.vertexAttribPointer();
+	this.vertexPositionAttribute.drawArrays(5);
+	$s.pop();
+}
+sa.view.DebugRenderer.prototype.__class__ = sa.view.DebugRenderer;
 sa.view.MainInterfaceView = function(p) { if( p === $_ ) return; {
 	$s.push("sa.view.MainInterfaceView::new");
 	var $spos = $s.length;
@@ -6445,7 +6531,7 @@ sa.controller.StageResizeAction.prototype.updateSize = function() {
 	var aspect = this.commonModel.windowWidth / this.commonModel.windowHeight;
 	var fov = (aspect - 1.6) * 10;
 	if(fov < -30) fov = -30;
-	this.commonModel.projectionMatrix.perspective(40 - fov,aspect,0.1,500.0);
+	this.commonModel.projectionMatrix.perspective(40,aspect,0.1,500.0);
 	GLDisplayList.getDefault().setStageSize(this.commonModel.windowWidth,this.commonModel.windowHeight);
 	$s.pop();
 }
@@ -6537,7 +6623,6 @@ Matrix3.prototype.toString = function() {
 	$s.pop();
 }
 Matrix3.prototype.__class__ = Matrix3;
-if(!sa.view.shader) sa.view.shader = {}
 sa.view.shader.FloorVertex = function() { }
 sa.view.shader.FloorVertex.__name__ = ["sa","view","shader","FloorVertex"];
 sa.view.shader.FloorVertex.prototype.__class__ = sa.view.shader.FloorVertex;
@@ -7015,7 +7100,6 @@ sa.model.CommonModel = function(p) { if( p === $_ ) return; {
 	this.projectionMatrix = new Matrix4();
 	this.projectionMatrix.perspective(45,1 / 1,0.1,100.0);
 	this.cameraMatrix = new Matrix4();
-	this.cameraMatrix.lookAt(new Vec3(0,0,0),new Vec3(0,0,-15),new Vec3(0,1,0));
 	this.modeChangeSignaler = new hsl.haxe.DirectSignaler(this);
 	$s.pop();
 }}
@@ -7036,7 +7120,7 @@ sa.model.CommonModel.prototype.toggleMode = function() {
 	var $spos = $s.length;
 	this.mode++;
 	this.mode = this.mode % 3;
-	this.modeChangeSignaler.dispatch(this.mode,null,{ fileName : "CommonModel.hx", lineNumber : 48, className : "sa.model.CommonModel", methodName : "toggleMode"});
+	this.modeChangeSignaler.dispatch(this.mode,null,{ fileName : "CommonModel.hx", lineNumber : 47, className : "sa.model.CommonModel", methodName : "toggleMode"});
 	$s.pop();
 }
 sa.model.CommonModel.prototype.toggleCredits = function() {
@@ -7062,6 +7146,7 @@ sa.view.CanvasView.prototype.mainInterfaceView = null;
 sa.view.CanvasView.prototype.gl = null;
 sa.view.CanvasView.prototype.canvas = null;
 sa.view.CanvasView.prototype.floorRenderer = null;
+sa.view.CanvasView.prototype.debugRenderer = null;
 sa.view.CanvasView.prototype.displayListRenderer = null;
 sa.view.CanvasView.prototype.handleLauncherStart = function(event) {
 	$s.push("sa.view.CanvasView::handleLauncherStart");
@@ -7073,11 +7158,15 @@ sa.view.CanvasView.prototype.handleLauncherStart = function(event) {
 	this.floorRenderer.projectionMatrix = this.commonModel.projectionMatrix;
 	this.floorRenderer.cameraMatrix = this.commonModel.cameraMatrix;
 	this.floorRenderer.init();
+	this.debugRenderer = new sa.view.DebugRenderer();
+	this.debugRenderer.projectionMatrix = this.commonModel.projectionMatrix;
+	this.debugRenderer.cameraMatrix = this.commonModel.cameraMatrix;
+	this.debugRenderer.init();
 	this.displayListRenderer = new GLDisplayListRenderer();
 	this.displayListRenderer.init();
 	var inst = this;
 	GLTimeout.executeLater(null,function() {
-		$s.push("sa.view.CanvasView::handleLauncherStart@45");
+		$s.push("sa.view.CanvasView::handleLauncherStart@51");
 		var $spos = $s.length;
 		GLAnimationFrame.run($closure(inst,"tick"));
 		$s.pop();
@@ -8031,6 +8120,9 @@ sa.event.StageResize.__name__ = ["sa","event","StageResize"];
 sa.event.StageResize.__super__ = bpmjs.Event;
 for(var k in bpmjs.Event.prototype ) sa.event.StageResize.prototype[k] = bpmjs.Event.prototype[k];
 sa.event.StageResize.prototype.__class__ = sa.event.StageResize;
+sa.view.shader.DebugFragment = function() { }
+sa.view.shader.DebugFragment.__name__ = ["sa","view","shader","DebugFragment"];
+sa.view.shader.DebugFragment.prototype.__class__ = sa.view.shader.DebugFragment;
 bpmjs.ImageLoaderTask = function(p) { if( p === $_ ) return; {
 	$s.push("bpmjs.ImageLoaderTask::new");
 	var $spos = $s.length;
@@ -8070,6 +8162,32 @@ Matrix4 = function(cloneFrom) { if( cloneFrom === $_ ) return; {
 	$s.pop();
 }}
 Matrix4.__name__ = ["Matrix4"];
+Matrix4.createTranslation = function(x,y,z) {
+	$s.push("Matrix4::createTranslation");
+	var $spos = $s.length;
+	var result = new Matrix4();
+	result.buffer[0] = 1;
+	result.buffer[1] = 0;
+	result.buffer[2] = 0;
+	result.buffer[3] = 0;
+	result.buffer[4] = 0;
+	result.buffer[5] = 1;
+	result.buffer[6] = 0;
+	result.buffer[7] = 0;
+	result.buffer[8] = 0;
+	result.buffer[9] = 0;
+	result.buffer[10] = 1;
+	result.buffer[11] = 0;
+	result.buffer[12] = x;
+	result.buffer[13] = y;
+	result.buffer[14] = z;
+	result.buffer[15] = 1;
+	{
+		$s.pop();
+		return result;
+	}
+	$s.pop();
+}
 Matrix4.prototype.buffer = null;
 Matrix4.prototype.identity = function() {
 	$s.push("Matrix4::identity");
@@ -8235,10 +8353,8 @@ Matrix4.prototype.frustum = function(left,right,bottom,top,near,far) {
 Matrix4.prototype.appendTranslation = function(x,y,z) {
 	$s.push("Matrix4::appendTranslation");
 	var $spos = $s.length;
-	this.buffer[12] = this.buffer[0] * x + this.buffer[4] * y + this.buffer[8] * z + this.buffer[12];
-	this.buffer[13] = this.buffer[1] * x + this.buffer[5] * y + this.buffer[9] * z + this.buffer[13];
-	this.buffer[14] = this.buffer[2] * x + this.buffer[6] * y + this.buffer[10] * z + this.buffer[14];
-	this.buffer[15] = this.buffer[3] * x + this.buffer[7] * y + this.buffer[11] * z + this.buffer[15];
+	var m = Matrix4.createTranslation(x,y,z);
+	this.multiply(m);
 	$s.pop();
 }
 Matrix4.prototype.appendScale = function(x,y,z) {
@@ -8665,11 +8781,12 @@ bpmjs.Event.START = "start";
 GLCursorClient.DEFAULT = "default";
 GLCursorClient.HAND = "pointer";
 sa.controller.CameraController.__meta__ = { fields : { commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}}};
-sa.controller.CameraController.__rtti = "<class path=\"sa.controller.CameraController\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<cameraPosition><c path=\"MoveSetVec2\"/></cameraPosition>\n\t<lastTick><c path=\"Float\"/></lastTick>\n\t<handleLauncherStart set=\"method\" line=\"24\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<tick set=\"method\" line=\"30\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<handleMouseMove set=\"method\" line=\"40\"><f a=\"mousePos\">\n\t<c path=\"Vec2\"/>\n\t<e path=\"Void\"/>\n</f></handleMouseMove>\n\t<new public=\"1\" set=\"method\" line=\"18\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
+sa.controller.CameraController.__rtti = "<class path=\"sa.controller.CameraController\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<cameraPosition><c path=\"MoveSetVec2\"/></cameraPosition>\n\t<lastTick><c path=\"Float\"/></lastTick>\n\t<handleLauncherStart set=\"method\" line=\"24\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<tick set=\"method\" line=\"30\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<handleMouseMove set=\"method\" line=\"42\"><f a=\"mousePos\">\n\t<c path=\"Vec2\"/>\n\t<e path=\"Void\"/>\n</f></handleMouseMove>\n\t<new public=\"1\" set=\"method\" line=\"18\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 sa.Config.__rtti = "<class path=\"sa.Config\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel public=\"1\"><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry public=\"1\"><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<imageRegistry public=\"1\"><c path=\"GLImageRegistry\"/></imageRegistry>\n\t<stageResizeAction public=\"1\"><c path=\"sa.controller.StageResizeAction\"/></stageResizeAction>\n\t<launcher public=\"1\"><c path=\"sa.controller.Launcher\"/></launcher>\n\t<audioController public=\"1\"><c path=\"sa.controller.AudioController\"/></audioController>\n\t<cameraController public=\"1\"><c path=\"sa.controller.CameraController\"/></cameraController>\n\t<canvasView public=\"1\"><c path=\"sa.view.CanvasView\"/></canvasView>\n\t<preloaderView public=\"1\"><c path=\"sa.view.PreloaderView\"/></preloaderView>\n\t<mainInterfaceView public=\"1\"><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<controller set=\"method\" line=\"47\"><f a=\"\"><e path=\"Void\"/></f></controller>\n\t<model set=\"method\" line=\"55\"><f a=\"\"><e path=\"Void\"/></f></model>\n\t<view set=\"method\" line=\"76\"><f a=\"\"><e path=\"Void\"/></f></view>\n\t<new public=\"1\" set=\"method\" line=\"40\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 bpmjs.Stats.fps = 0;
 sa.controller.AudioController.__meta__ = { fields : { commonModel : { Inject : null}, handleLauncherStart : { MessageHandler : null}}};
 sa.controller.AudioController.__rtti = "<class path=\"sa.controller.AudioController\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel public=\"1\"><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<audio><c path=\"Audio\"/></audio>\n\t<peaks><c path=\"Array\"><c path=\"Float\"/></c></peaks>\n\t<handleLauncherStart public=\"1\" set=\"method\" line=\"30\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleTimer set=\"method\" line=\"39\"><f a=\"\"><e path=\"Void\"/></f></handleTimer>\n\t<new public=\"1\" set=\"method\" line=\"18\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
+sa.view.shader.DebugVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec3 vertexPosition;\n\tattribute vec4 vertexColor;\n\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 viewWorldMatrix;\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tcolor = vertexColor;\n\t\tgl_Position = projectionMatrix * viewWorldMatrix * vec4(vertexPosition, 1.0);\n\t}\n\n"]}};
 sa.controller.Launcher.__meta__ = { obj : { ManagedEvents : ["launcherStart"]}, fields : { textureRegistry : { Inject : null}, imageRegistry : { Inject : null}, preloaderView : { Inject : null}, handlePostComplete : { PostComplete : null}}};
 sa.controller.Launcher.__rtti = "<class path=\"sa.controller.Launcher\" params=\"\">\n\t<extends path=\"bpmjs.EventDispatcher\"/>\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<imageRegistry><c path=\"GLImageRegistry\"/></imageRegistry>\n\t<preloaderView><c path=\"sa.view.PreloaderView\"/></preloaderView>\n\t<handlePostComplete public=\"1\" set=\"method\" line=\"29\"><f a=\"\"><e path=\"Void\"/></f></handlePostComplete>\n\t<handleComplete set=\"method\" line=\"40\"><f a=\"task\">\n\t<c path=\"bpmjs.TaskGroup\"/>\n\t<e path=\"Void\"/>\n</f></handleComplete>\n\t<createTextureTask set=\"method\" line=\"53\"><f a=\"location:texture:scaleMod\">\n\t<c path=\"String\"/>\n\t<e path=\"sa.view.TextureId\"/>\n\t<c path=\"Int\"/>\n\t<c path=\"bpmjs.ImageLoaderTask\"/>\n</f></createTextureTask>\n\t<createImageTask set=\"method\" line=\"70\"><f a=\"location:image\">\n\t<c path=\"String\"/>\n\t<e path=\"sa.view.ImageId\"/>\n\t<c path=\"bpmjs.ImageLoaderTask\"/>\n</f></createImageTask>\n\t<new public=\"1\" set=\"method\" line=\"17\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 Xml.enode = new EReg("^<([a-zA-Z0-9:_-]+)","");
@@ -8693,11 +8810,11 @@ sa.view.MainInterfaceView.__meta__ = { fields : { imageRegistry : { Inject : nul
 sa.view.MainInterfaceView.__rtti = "<class path=\"sa.view.MainInterfaceView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<imageRegistry><c path=\"GLImageRegistry\"/></imageRegistry>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<stage public=\"1\"><c path=\"GLStage\"/></stage>\n\t<handleLauncherStart set=\"method\" line=\"29\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<new public=\"1\" set=\"method\" line=\"23\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 sa.controller.StageResizeAction.__meta__ = { obj : { ManagedEvents : ["stageResize"]}, fields : { commonModel : { Inject : null}, handleComplete : { Complete : null}, handleLauncherStart : { MessageHandler : null}}};
 sa.controller.StageResizeAction.__rtti = "<class path=\"sa.controller.StageResizeAction\" params=\"\">\n\t<extends path=\"bpmjs.EventDispatcher\"/>\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel public=\"1\"><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<handleComplete public=\"1\" set=\"method\" line=\"22\"><f a=\"\"><e path=\"Void\"/></f></handleComplete>\n\t<handleLauncherStart public=\"1\" set=\"method\" line=\"28\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<timerUpdate set=\"method\" line=\"34\"><f a=\"\"><e path=\"Void\"/></f></timerUpdate>\n\t<onResize set=\"method\" line=\"40\"><f a=\"?event\">\n\t<t path=\"js.Event\"/>\n\t<e path=\"Void\"/>\n</f></onResize>\n\t<updateSize set=\"method\" line=\"46\"><f a=\"\"><e path=\"Void\"/></f></updateSize>\n\t<fireUpdate set=\"method\" line=\"60\"><f a=\"\"><e path=\"Void\"/></f></fireUpdate>\n\t<new public=\"1\" set=\"method\" line=\"16\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
-sa.view.shader.FloorVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec2 vertexPosition;\n\tattribute vec3 vertexNormal;\n\n\tuniform mat3 normalMatrix;\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 viewWorldMatrix;\n\n\tvarying vec3 vertex;\n\tvarying vec3 normal;\n\n\tvoid main(void)\n\t{\n\t\tvec4 vertexPositionTransformed = viewWorldMatrix * vec4(vertexPosition, 0.0, 1.0);\n\n\t\tvertex = vertexPositionTransformed.xyz;\n\t\tnormal = normalMatrix * vertexNormal;\n\n\t\tgl_Position = projectionMatrix * vertexPositionTransformed;\n\t}\n\n"]}};
+sa.view.shader.FloorVertex.__meta__ = { obj : { GLSL : ["\n\n\tattribute vec3 vertexPosition;\n\tattribute vec3 vertexNormal;\n\n\tuniform mat3 normalMatrix;\n\tuniform mat4 projectionMatrix;\n\tuniform mat4 viewWorldMatrix;\n\n\tvarying vec3 vertex;\n\tvarying vec3 normal;\n\n\tvoid main(void)\n\t{\n\t\tvec4 vertexPositionTransformed = viewWorldMatrix * vec4(vertexPosition, 1.0);\n\n\t\tvertex = vertexPositionTransformed.xyz;\n\t\tnormal = normalMatrix * vertexNormal;\n\t\tgl_Position = projectionMatrix * vertexPositionTransformed;\n\t}\n\n"]}};
 shader.DisplayObjectFragment.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform sampler2D texture;\n\tuniform float alpha;\n\n\tvarying vec2 textureCoord;\n\n\tvoid main(void)\n\t{\n\t\tvec4 color = texture2D(texture, textureCoord);\n\t\tgl_FragColor = color * vec4(1.0, 1.0, 1.0, alpha);\n\t}\n\n"]}};
-sa.view.shader.FloorFragment.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform vec3 lightPos;\n\n\tvarying vec3 vertex;\n\tvarying vec3 normal;\n\n\tvoid main(void)\n\t{\n\t\tvec3 lightDir = normalize(lightPos - vertex);\n\t\tfloat diffuse = dot(normalize(normal), lightDir);\n\t\tgl_FragColor = vec4(vec3(1.0, 0.0, 0.0) * diffuse, 1.0);\n\t}\n\n"]}};
+sa.view.shader.FloorFragment.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tuniform vec3 lightPositions[5];\n\tuniform vec3 lightDiffuseColors[5];\n\tuniform vec3 lightSpecularColors[5];\n\n\tvarying vec3 vertex;\n\tvarying vec3 normal;\n\tvoid main(void)\n\t{\n\t\tvec3 final = vec3(0.0, 0.0, 0.0);\n\t\tfor(int lightIndex = 0; lightIndex < 2; lightIndex++)\n\t\t{\n\t\t\tvec3 light = lightPositions[lightIndex];\n\t\t\tvec3 lightDir = normalize(light - vertex);\n\t\t\tfloat diffuse = dot(normalize(normal), lightDir);\n\n\t\t\tvec3 viewDir = normalize(-vertex.xyz);\n\t\t\tvec3 reflectionDirection = reflect(lightDir, normal);\n\n\t\t\tfloat specular = pow(max(dot(-reflectionDirection, viewDir), 0.0), 30.0);\n\n\t\t\tfinal += lightDiffuseColors[lightIndex] * 0.2 + lightDiffuseColors[lightIndex] * diffuse + lightSpecularColors[lightIndex] * specular;\n\t\t}\n\n\t\tgl_FragColor = vec4(final, 1.0);\n\t}\n\n"]}};
 sa.view.CanvasView.__meta__ = { fields : { commonModel : { Inject : null}, textureRegistry : { Inject : null}, mainInterfaceView : { Inject : null}, handleLauncherStart : { MessageHandler : null}, handleStageResize : { MessageHandler : null}}};
-sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<mainInterfaceView><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<gl><c path=\"WebGLRenderingContext\"/></gl>\n\t<canvas><c path=\"Canvas\"/></canvas>\n\t<floorRenderer><c path=\"sa.view.FloorRenderer\"/></floorRenderer>\n\t<displayListRenderer><c path=\"GLDisplayListRenderer\"/></displayListRenderer>\n\t<handleLauncherStart set=\"method\" line=\"29\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleStageResize set=\"method\" line=\"52\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<updateCanvas set=\"method\" line=\"57\"><f a=\"\"><e path=\"Void\"/></f></updateCanvas>\n\t<tick set=\"method\" line=\"63\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<renderScene set=\"method\" line=\"78\"><f a=\"\"><e path=\"Void\"/></f></renderScene>\n\t<renderInterface set=\"method\" line=\"84\"><f a=\"\"><e path=\"Void\"/></f></renderInterface>\n\t<new public=\"1\" set=\"method\" line=\"26\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
+sa.view.CanvasView.__rtti = "<class path=\"sa.view.CanvasView\" params=\"\">\n\t<implements path=\"haxe.rtti.Infos\"/>\n\t<commonModel><c path=\"sa.model.CommonModel\"/></commonModel>\n\t<textureRegistry><c path=\"GLTextureRegistry\"/></textureRegistry>\n\t<mainInterfaceView><c path=\"sa.view.MainInterfaceView\"/></mainInterfaceView>\n\t<gl><c path=\"WebGLRenderingContext\"/></gl>\n\t<canvas><c path=\"Canvas\"/></canvas>\n\t<floorRenderer><c path=\"sa.view.FloorRenderer\"/></floorRenderer>\n\t<debugRenderer><c path=\"sa.view.DebugRenderer\"/></debugRenderer>\n\t<displayListRenderer><c path=\"GLDisplayListRenderer\"/></displayListRenderer>\n\t<handleLauncherStart set=\"method\" line=\"30\"><f a=\"event\">\n\t<c path=\"sa.event.LauncherStart\"/>\n\t<e path=\"Void\"/>\n</f></handleLauncherStart>\n\t<handleStageResize set=\"method\" line=\"58\"><f a=\"event\">\n\t<c path=\"sa.event.StageResize\"/>\n\t<e path=\"Void\"/>\n</f></handleStageResize>\n\t<updateCanvas set=\"method\" line=\"63\"><f a=\"\"><e path=\"Void\"/></f></updateCanvas>\n\t<tick set=\"method\" line=\"69\"><f a=\"\"><e path=\"Void\"/></f></tick>\n\t<renderScene set=\"method\" line=\"84\"><f a=\"\"><e path=\"Void\"/></f></renderScene>\n\t<renderInterface set=\"method\" line=\"91\"><f a=\"\"><e path=\"Void\"/></f></renderInterface>\n\t<new public=\"1\" set=\"method\" line=\"27\"><f a=\"\"><e path=\"Void\"/></f></new>\n</class>";
 GL.DEPTH_BUFFER_BIT = 256;
 GL.STENCIL_BUFFER_BIT = 1024;
 GL.COLOR_BUFFER_BIT = 16384;
@@ -8995,5 +9112,6 @@ GL.FRAMEBUFFER_BINDING = 36006;
 GL.RENDERBUFFER_BINDING = 36007;
 GL.MAX_RENDERBUFFER_SIZE = 34024;
 GL.INVALID_FRAMEBUFFER_OPERATION = 1286;
+sa.view.shader.DebugFragment.__meta__ = { obj : { GLSL : ["\n\n\t#ifdef GL_ES\n\t\tprecision highp float;\n\t#endif\n\n\tvarying vec4 color;\n\n\tvoid main(void)\n\t{\n\t\tgl_FragColor = color;\n\t}\n\n"]}};
 js.Lib.onerror = null;
 sa.Main.main()

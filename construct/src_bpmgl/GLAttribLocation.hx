@@ -29,7 +29,11 @@ class GLAttribLocation
 	public function drawArrays(mode : GLenum, ?first : GLint = 0, ?count : GLsizei = null)
 	{
 		if (count == null)
+		{
 			count = currentLength / size;
+			if (type == GL.FLOAT)
+				count /= 4;
+		}
 		GL.drawArrays(mode, first, count);
 	}
 }

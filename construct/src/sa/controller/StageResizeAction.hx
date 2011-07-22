@@ -52,7 +52,7 @@ class StageResizeAction extends EventDispatcher, implements Infos
 		var fov = (aspect - 1.6) * 10;
 		if (fov < -30)
 			fov = -30;
-		commonModel.projectionMatrix.perspective(40 - fov, aspect, 0.1, 500.0);
+		commonModel.projectionMatrix.perspective(40, aspect, 0.1, 500.0);
 
 		GLDisplayList.getDefault().setStageSize(commonModel.windowWidth, commonModel.windowHeight);
 	}

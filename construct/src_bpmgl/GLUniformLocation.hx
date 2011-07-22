@@ -121,6 +121,11 @@ class GLUniformLocation
 		GL.gl.uniform3f(location, color.r, color.g, color.b);
 	}
 
+	public inline function setRGBA(color : Color) : Void
+	{
+		GL.gl.uniform4f(location, color.r, color.g, color.b, color.a);
+	}
+
 	public inline function setTexture(texture : GLTexture, ?index : GLint = 0) : Void
 	{
 		GL.activeTexture(cast GL.TEXTURE0 + index);

@@ -21,6 +21,7 @@ class CanvasView implements Infos
 	var canvas : Canvas;
 
 	var floorRenderer : FloorRenderer;
+	var debugRenderer : DebugRenderer;
 	var displayListRenderer : GLDisplayListRenderer;
 
 	public function new() {}
@@ -37,6 +38,11 @@ class CanvasView implements Infos
 		floorRenderer.projectionMatrix = commonModel.projectionMatrix;
 		floorRenderer.cameraMatrix = commonModel.cameraMatrix;
 		floorRenderer.init();
+
+		debugRenderer = new DebugRenderer();
+		debugRenderer.projectionMatrix = commonModel.projectionMatrix;
+		debugRenderer.cameraMatrix = commonModel.cameraMatrix;
+		debugRenderer.init();
 
 		displayListRenderer = new GLDisplayListRenderer();
 		displayListRenderer.init();
@@ -79,6 +85,7 @@ class CanvasView implements Infos
 	{
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		floorRenderer.render(canvas.width, canvas.height);
+		//debugRenderer.render(canvas.width, canvas.height);
 	}
 
 	function renderInterface()

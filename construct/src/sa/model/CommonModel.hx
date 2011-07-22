@@ -36,7 +36,6 @@ class CommonModel
 		projectionMatrix.perspective(45, 1/1, 0.1, 100.0);
 
 		cameraMatrix = new Matrix4();
-		cameraMatrix.lookAt(new Vec3(0,0,0), new Vec3(0,0,-15), new Vec3(0,1,0));
 
 		modeChangeSignaler = new DirectSignaler(this);
 	}

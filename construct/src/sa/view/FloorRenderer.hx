@@ -14,7 +14,9 @@ class FloorRenderer
 	var projectionMatrixUniform : GLUniformLocation;
 	var viewWorldMatrixUniform : GLUniformLocation;
 	var normalMatrixUniform : GLUniformLocation;
-	var lightPosUniform : GLUniformLocation;
+	var lightPositionsUniform : GLUniformLocation;
+	var lightDiffuseColorsUniform : GLUniformLocation;
+	var lightSpecularColorsUniform : GLUniformLocation;
 
 	public function new() {}
 
@@ -22,23 +24,26 @@ class FloorRenderer
 	{
 		shaderProgram = GL.createProgram(sa.view.shader.FloorVertex, sa.view.shader.FloorFragment);
 
-		vertexPositionAttribute = GL.getAttribLocation2("vertexPosition", 2, GL.BYTE);
-		vertexPositionAttribute.updateBuffer(new Int8Array([
-			-1, -1,
-			1, -1,
-			-1, 1,
-			1, 1,
+		vertexPositionAttribute = GL.getAttribLocation2("vertexPosition", 3, GL.FLOAT);
+		vertexPositionAttribute.updateBuffer(new Float32Array([
+			-1, 0, -1,
+			1, 0, -1,
+			-1, 0, 1,
+			1, 0, 1
 		]));
 
 		vertexNormalAttribute = GL.getAttribLocation2("vertexNormal", 3, GL.BYTE);
 		vertexNormalAttribute.updateBuffer(new Int8Array([
-			0, 0, 1,
-			0, 0, 1,
-			0, 0, 1,
-			0, 0, 1
+			0, 1, 0,
+			0, 1, 0,
+			0, 1, 0,
+			0, 1, 0
 		]));
 
-		lightPosUniform = GL.getUniformLocation("lightPos");
+		lightPositionsUniform = GL.getUniformLocation("lightPositions");
+		lightDiffuseColorsUniform = GL.getUniformLocation("lightDiffuseColors");
+		lightSpecularColorsUniform = GL.getUniformLocation("lightSpecularColors");
+
 		projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
 		viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
 		normalMatrixUniform = GL.getUniformLocation("normalMatrix");
@@ -54,9 +59,9 @@ class FloorRenderer
 		projectionMatrixUniform.setMatrix4(projectionMatrix);
 
 		var viewWorldMatrix = new Matrix4(cameraMatrix);
-		viewWorldMatrix.appendTranslation(0, -10, -40);
-		viewWorldMatrix.appendScale(40, 40, 1);
-		viewWorldMatrix.appendRotation(Math.PI / 2, new Vec3(1, 0, 0));
+		viewWorldMatrix.appendTranslation(0, 0, 0);
+		viewWorldMatrix.appendScale(50, 50, 50);
+
 		viewWorldMatrixUniform.setMatrix4(viewWorldMatrix);
 
 		var normalMatrix = viewWorldMatrix.toInverseMatrix3();
@@ -66,10 +71,40 @@ class FloorRenderer
 		vertexPositionAttribute.vertexAttribPointer();
 		vertexNormalAttribute.vertexAttribPointer();
 
-		var light = new Vec3(0, 10, -30);
-		light.transform(cameraMatrix);
-		lightPosUniform.setVec3(light);
+		var lights = [];
 
-		vertexPositionAttribute.drawArrays(GL.TRIANGLE_STRIP);
+		var light = new Vec3(Math.sin(time / 1000) * 5, 1, Math.cos(time / 1000) * 5);
+		light.transform(cameraMatrix);
+		lights.push(light.x);
+		lights.push(light.y);
+		lights.push(light.z);
+
+		var light = new Vec3(Math.sin(time / 1000) * 20, 2, Math.cos(time / 300) * 10);
+		light.transform(cameraMatrix);
+		lights.push(light.x);
+		lights.push(light.y);
+		lights.push(light.z);
+
+		GL.gl.uniform3fv(lightPositionsUniform.location, lights);
+
+		var diffuseColors = [];
+		diffuseColors.push(1.0);
+		diffuseColors.push(0);
+		diffuseColors.push(0);
+		diffuseColors.push(0);
+		diffuseColors.push(0);
+		diffuseColors.push(1);
+		GL.gl.uniform3fv(lightDiffuseColorsUniform.location, diffuseColors);
+
+		var specularColors = [];
+		specularColors.push(1.0);
+		specularColors.push(0.5);
+		specularColors.push(0.5);
+		specularColors.push(0.5);
+		specularColors.push(0.5);
+		specularColors.push(1);
+		GL.gl.uniform3fv(lightSpecularColorsUniform.location, specularColors);
+
+		vertexPositionAttribute.drawArrays(GL.TRIANGLE_STRIP, 0, 4);
 	}
 }

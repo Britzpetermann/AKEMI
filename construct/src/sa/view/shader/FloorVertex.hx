@@ -1,7 +1,7 @@
 package sa.view.shader;
 @GLSL("
 
-	attribute vec2 vertexPosition;
+	attribute vec3 vertexPosition;
 	attribute vec3 vertexNormal;
 
 	uniform mat3 normalMatrix;
@@ -13,11 +13,10 @@ package sa.view.shader;
 
 	void main(void)
 	{
-		vec4 vertexPositionTransformed = viewWorldMatrix * vec4(vertexPosition, 0.0, 1.0);
+		vec4 vertexPositionTransformed = viewWorldMatrix * vec4(vertexPosition, 1.0);
 
 		vertex = vertexPositionTransformed.xyz;
 		normal = normalMatrix * vertexNormal;
-
 		gl_Position = projectionMatrix * vertexPositionTransformed;
 	}
 
