@@ -35,7 +35,7 @@ class CameraController implements Infos
 		cameraPosition.move(factor);
 
 		commonModel.cameraMatrix.identity();
-		commonModel.cameraMatrix.lookAt(new Vec3(cameraPosition.current.x, 50 + cameraPosition.current.y, 50), new Vec3(0, 10, 0), new Vec3(0, 1, 0));
+		commonModel.cameraMatrix.lookAt(new Vec3(cameraPosition.current.x, 40 + cameraPosition.current.y, 40), new Vec3(0, 3, 0), new Vec3(0, 1, 0));
 		commonModel.cameraMatrix.appendScale(1, 1, -1);
 	}
 
