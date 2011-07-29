@@ -13,11 +13,14 @@ class FloorRenderer
 	var projectionMatrixUniform : GLUniformLocation;
 	var viewWorldMatrixUniform : GLUniformLocation;
 	var normalMatrixUniform : GLUniformLocation;
-	var cameraMatrixUniform : GLUniformLocation;
 	var lightPositionsUniform : GLUniformLocation;
 	var lightDiffuseColorsUniform : GLUniformLocation;
 	var lightSpecularColorsUniform : GLUniformLocation;
+	var darkSpotsUniform : GLUniformLocation;
+	var darkSpotCountUniform : GLUniformLocation;
 	var moonVertexIndexBuffer : WebGLBuffer;
+
+	var spheres : Array<SphereData>;
 
 	public function new() {}
 
@@ -31,11 +34,12 @@ class FloorRenderer
 		lightPositionsUniform = GL.getUniformLocation("lightPositions");
 		lightDiffuseColorsUniform = GL.getUniformLocation("lightDiffuseColors");
 		lightSpecularColorsUniform = GL.getUniformLocation("lightSpecularColors");
+		darkSpotsUniform = GL.getUniformLocation("darkSpots");
+		darkSpotCountUniform = GL.getUniformLocation("darkSpotCount");
 
 		projectionMatrixUniform = GL.getUniformLocation("projectionMatrix");
 		viewWorldMatrixUniform = GL.getUniformLocation("viewWorldMatrix");
 		normalMatrixUniform = GL.getUniformLocation("normalMatrix");
-		cameraMatrixUniform = GL.getUniformLocation("cameraMatrix");
 
 		moonVertexIndexBuffer = GL.createBuffer();
 	}
@@ -47,7 +51,6 @@ class FloorRenderer
 		GL.useProgram(shaderProgram);
 		GL.viewport(0, 0, width, height);
 
-		cameraMatrixUniform.setMatrix4(cameraMatrix);
 		projectionMatrixUniform.setMatrix4(projectionMatrix);
 
 		var lights = [];
@@ -100,9 +103,58 @@ class FloorRenderer
 		GL.gl.uniform3fv(lightSpecularColorsUniform.location, specularColors);
 
 		GL.gl.enable(GL.DEPTH_TEST);
+
+		defineSpheres();
+
+		var darkSpots = [];
+		for(sphereData in spheres)
+		{
+			var sphereDataT = sphereData.position.clone();
+			sphereDataT.transform(cameraMatrix);
+
+			darkSpots.push(sphereDataT.x);
+			darkSpots.push(sphereDataT.y - 3);
+			darkSpots.push(sphereDataT.z);
+		}
+		darkSpotCountUniform.uniform1i(spheres.length);
+		GL.gl.uniform3fv(darkSpotsUniform.location, darkSpots);
+
 		drawFloor();
 		drawSpheres();
+
 		GL.gl.disable(GL.DEPTH_TEST);
+	}
+
+	function defineSpheres()
+	{
+		spheres = new Array();
+
+		defineSphere(0,3,0);
+		defineSphere(6,3,0);
+		defineSphere(-6,3,0);
+		defineSphere(0,3,6);
+		defineSphere(6,3,6);
+		defineSphere(-6,3,6);
+		defineSphere(0,3,-6);
+		defineSphere(6,3,-6);
+		defineSphere(-6,3,-6);
+
+		defineSphere(0-3,3 + 4.2,6-3);
+		defineSphere(0-3,3 + 4.2,0-3);
+		defineSphere(6-3,3 + 4.2,6-3);
+		defineSphere(6-3,3 + 4.2,0-3);
+
+		defineSphere(0,3 + 4.2 * 2,0);
+	}
+
+	function defineSphere(x, y, z)
+	{
+		var sphereData = new SphereData();
+		sphereData.position.x = x;
+		sphereData.position.y = y;
+		sphereData.position.z = z;
+
+		spheres.push(sphereData);
 	}
 
 	function drawFloor()
@@ -136,7 +188,6 @@ class FloorRenderer
 
 	function drawSpheres()
 	{
-
 		var sphere = createSphere(20, 20);
 		vertexPositionAttribute.updateBuffer(new Float32Array(sphere.vertexPositionData));
 		vertexNormalAttribute.updateBuffer(new Float32Array(sphere.normalData));
@@ -146,28 +197,16 @@ class FloorRenderer
 		GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, moonVertexIndexBuffer);
 		GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(sphere.indexData), GL.STATIC_DRAW);
 
-		drawSphere(0,3,0, sphere);
-		drawSphere(6,3,0, sphere);
-		//drawSphere(-6,3,0, sphere);
-		//drawSphere(0,3,6, sphere);
-		//drawSphere(6,3,6, sphere);
-		//drawSphere(-6,3,6, sphere);
-		//drawSphere(0,3,-6, sphere);
-		//drawSphere(6,3,-6, sphere);
-		//drawSphere(-6,3,-6, sphere);
-
-		//drawSphere(0-3,3 + 4.2,6-3, sphere);
-		//drawSphere(0-3,3 + 4.2,0-3, sphere);
-		//drawSphere(6-3,3 + 4.2,6-3, sphere);
-		//drawSphere(6-3,3 + 4.2,0-3, sphere);
-
-		//drawSphere(0,3 + 4.2 * 2,0, sphere);
+		for(sphereData in spheres)
+		{
+			drawSphere(sphereData.position, sphere);
+		}
 	}
 
-	function drawSphere(x : Float, y : Float, z : Float, sphere)
+	function drawSphere(sphereData, sphere)
 	{
 		var viewWorldMatrix = new Matrix4(cameraMatrix);
-		viewWorldMatrix.appendTranslation(x, y, z);
+		viewWorldMatrix.appendTranslation(sphereData.x, sphereData.y, sphereData.z);
 		viewWorldMatrix.appendScale(3, 3, 3);
 		viewWorldMatrixUniform.setMatrix4(viewWorldMatrix);
 
@@ -222,5 +261,14 @@ class FloorRenderer
 		}
 
 		return {vertexPositionData : vertexPositionData, normalData : normalData, indexData : indexData, length : vertexPositionData.length};
+	}
+}
+
+class SphereData
+{
+	public var position : Vec3;
+	public function new()
+	{
+		position = new Vec3();
 	}
 }
